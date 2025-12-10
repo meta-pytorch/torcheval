@@ -64,8 +64,9 @@ def _binary_precision_recall_curve_update(
 def _binary_precision_recall_curve_compute(
     input: torch.Tensor,
     target: torch.Tensor,
+    weights: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    precision, recall, threshold = _compute_for_each_class(input, target, 1)
+    precision, recall, threshold = _compute_for_each_class(input, target, 1, weights)
 
     return precision, recall, threshold
 
@@ -210,11 +211,25 @@ def _compute_for_each_class(
     input: torch.Tensor,
     target: torch.Tensor,
     pos_label: int,
+    weights: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     threshold, indices = input.sort(descending=True)
     mask = F.pad(threshold.diff(dim=0) != 0, [0, 1], value=1.0)
-    num_tp = (target[indices] == pos_label).cumsum(0)[mask]
-    num_fp = (1 - (target[indices] == pos_label).long()).cumsum(0)[mask]
+
+    if weights is not None:
+        # Weighted version: compute weighted cumulative sums
+        sorted_weights = weights[indices]
+        is_positive = (target[indices] == pos_label).long()
+        is_negative = 1 - is_positive
+
+        # Compute weighted cumulative sums
+        num_tp = (is_positive * sorted_weights).cumsum(0)[mask]
+        num_fp = (is_negative * sorted_weights).cumsum(0)[mask]
+    else:
+        # Unweighted version: count occurrences
+        num_tp = (target[indices] == pos_label).cumsum(0)[mask]
+        num_fp = (1 - (target[indices] == pos_label).long()).cumsum(0)[mask]
+
     precision = (num_tp / (num_tp + num_fp)).flip(0)
     recall = (num_tp / num_tp[-1]).flip(0)
     threshold = threshold[mask].flip(0)

@@ -129,6 +129,81 @@ class TestBinaryRecallAtFixedPrecision(MetricClassTester):
             metric = BinaryRecallAtFixedPrecision(min_precision=1.1)
             metric.update(torch.rand(4), torch.rand(4))
 
+    def test_binary_recall_at_fixed_precision_with_weights_basic(self) -> None:
+        # Setup: Create input, target, and weight tensors
+        input = torch.tensor([0.1, 0.4, 0.6, 0.6, 0.6, 0.35, 0.8])
+        target = torch.tensor([0, 0, 1, 1, 1, 1, 1])
+        weight = torch.tensor([1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0])
+        min_precision = 0.5
+
+        # Execute: Create metric with use_weights=True and update
+        metric = BinaryRecallAtFixedPrecision(
+            min_precision=min_precision, use_weights=True
+        )
+        metric.update(input, target, weight)
+
+        # Assert: Compute should return recall and threshold tensors
+        recall, threshold = metric.compute()
+        self.assertIsInstance(recall, torch.Tensor)
+        self.assertIsInstance(threshold, torch.Tensor)
+        # Verify recall is a valid value between 0 and 1
+        self.assertGreaterEqual(recall.item(), 0.0)
+        self.assertLessEqual(recall.item(), 1.0)
+
+    def test_binary_recall_at_fixed_precision_with_weights_state_names(
+        self,
+    ) -> None:
+        # Setup: Create metric with use_weights=True
+        metric = BinaryRecallAtFixedPrecision(min_precision=0.5, use_weights=True)
+
+        # Execute: Check that weights state is present
+        state_dict = metric.state_dict()
+
+        # Assert: Verify that weights are included in state names
+        self.assertIn("weights", state_dict)
+        self.assertIn("inputs", state_dict)
+        self.assertIn("targets", state_dict)
+
+    def test_binary_recall_at_fixed_precision_with_weights_multiple_updates(
+        self,
+    ) -> None:
+        # Setup: Create multiple batches of input, target, and weight tensors
+        min_precision = 0.5
+        metric = BinaryRecallAtFixedPrecision(
+            min_precision=min_precision, use_weights=True
+        )
+
+        # Execute: Update metric with multiple batches
+        input1 = torch.tensor([0.1, 0.4, 0.6])
+        target1 = torch.tensor([0, 0, 1])
+        weight1 = torch.tensor([1.0, 1.0, 2.0])
+        metric.update(input1, target1, weight1)
+
+        input2 = torch.tensor([0.7, 0.8, 0.9])
+        target2 = torch.tensor([1, 1, 1])
+        weight2 = torch.tensor([1.5, 1.0, 1.0])
+        metric.update(input2, target2, weight2)
+
+        # Assert: Compute should successfully process accumulated data
+        recall, threshold = metric.compute()
+        self.assertIsInstance(recall, torch.Tensor)
+        self.assertIsInstance(threshold, torch.Tensor)
+        self.assertGreaterEqual(recall.item(), 0.0)
+        self.assertLessEqual(recall.item(), 1.0)
+
+    def test_binary_recall_at_fixed_precision_missing_weights_error(self) -> None:
+        # Setup: Create metric with use_weights=True
+        metric = BinaryRecallAtFixedPrecision(min_precision=0.5, use_weights=True)
+        input = torch.tensor([0.1, 0.4, 0.6, 0.6])
+        target = torch.tensor([0, 0, 1, 1])
+
+        # Execute & Assert: Verify error is raised when weights are not provided
+        with self.assertRaisesRegex(
+            ValueError,
+            "Weights must be provided when use_weights=True",
+        ):
+            metric.update(input, target)
+
 
 class TestMultilabelRecallAtFixedPrecision(MetricClassTester):
     def _test_multilabel_recall_at_fixed_precision_class_with_input(

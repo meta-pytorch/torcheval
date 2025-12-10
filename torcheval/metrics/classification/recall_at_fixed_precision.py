@@ -39,6 +39,9 @@ class BinaryRecallAtFixedPrecision(Metric[tuple[torch.Tensor, torch.Tensor]]):
 
     Args:
         min_precision (float): Minimum precision threshold
+        use_weights (bool): If True, enables weighted recall computation.
+            When enabled, the `update()` method requires a `weight` parameter.
+            Default: False
 
     Examples::
 
@@ -50,6 +53,15 @@ class BinaryRecallAtFixedPrecision(Metric[tuple[torch.Tensor, torch.Tensor]]):
         >>> metric.update(input, target)
         >>> metric.compute()
         (torch.tensor(1.0), torch.tensor(0.35))
+
+        >>> # With weights
+        >>> metric = BinaryRecallAtFixedPrecision(min_precision=0.5, use_weights=True)
+        >>> input = torch.tensor([0.1, 0.4, 0.6, 0.6, 0.6, 0.35, 0.8])
+        >>> target = torch.tensor([0, 0, 1, 1, 1, 1, 1])
+        >>> weight = torch.tensor([1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0])
+        >>> metric.update(input, target, weight)
+        >>> metric.compute()
+        (torch.tensor(1.0), torch.tensor(0.35))
     """
 
     def __init__(
@@ -57,11 +69,15 @@ class BinaryRecallAtFixedPrecision(Metric[tuple[torch.Tensor, torch.Tensor]]):
         *,
         min_precision: float,
         device: torch.device | None = None,
+        use_weights: bool = False,
     ) -> None:
         super().__init__(device=device)
         self.min_precision = min_precision
+        self.use_weights = use_weights
         self._add_state("inputs", [])
         self._add_state("targets", [])
+        if self.use_weights:
+            self._add_state("weights", [])
 
     @torch.inference_mode()
     # pyre-ignore[14]: inconsistent override on *_:Any, **__:Any
@@ -69,6 +85,7 @@ class BinaryRecallAtFixedPrecision(Metric[tuple[torch.Tensor, torch.Tensor]]):
         self: TBinaryRecallAtFixedPrecision,
         input: torch.Tensor,
         target: torch.Tensor,
+        weight: torch.Tensor | None = None,
     ) -> TBinaryRecallAtFixedPrecision:
         input = input.to(self.device)
         target = target.to(self.device)
@@ -78,14 +95,27 @@ class BinaryRecallAtFixedPrecision(Metric[tuple[torch.Tensor, torch.Tensor]]):
         )
         self.inputs.append(input)
         self.targets.append(target)
+
+        if self.use_weights:
+            if weight is None:
+                raise ValueError("Weights must be provided when use_weights=True")
+            weight = weight.to(self.device)
+            self.weights.append(weight)
         return self
 
     @torch.inference_mode()
     def compute(
         self: TBinaryRecallAtFixedPrecision,
     ) -> tuple[torch.Tensor, torch.Tensor]:
+        inputs = torch.cat(self.inputs)
+        targets = torch.cat(self.targets)
+        if self.use_weights:
+            weights = torch.cat(self.weights)
+            return _binary_recall_at_fixed_precision_compute(
+                inputs, targets, self.min_precision, weights
+            )
         return _binary_recall_at_fixed_precision_compute(
-            torch.cat(self.inputs), torch.cat(self.targets), self.min_precision
+            inputs, targets, self.min_precision
         )
 
     @torch.inference_mode()
@@ -99,6 +129,9 @@ class BinaryRecallAtFixedPrecision(Metric[tuple[torch.Tensor, torch.Tensor]]):
                 metric_targets = torch.cat(metric.targets).to(self.device)
                 self.inputs.append(metric_inputs)
                 self.targets.append(metric_targets)
+                if self.use_weights:
+                    metric_weights = torch.cat(metric.weights).to(self.device)
+                    self.weights.append(metric_weights)
         return self
 
     @torch.inference_mode()
@@ -106,6 +139,8 @@ class BinaryRecallAtFixedPrecision(Metric[tuple[torch.Tensor, torch.Tensor]]):
         if self.inputs and self.targets:
             self.inputs = [torch.cat(self.inputs)]
             self.targets = [torch.cat(self.targets)]
+            if self.use_weights:
+                self.weights = [torch.cat(self.weights)]
 
 
 class MultilabelRecallAtFixedPrecision(

@@ -67,9 +67,14 @@ def _binary_recall_at_fixed_precision_update_input_check(
 
 
 def _binary_recall_at_fixed_precision_compute(
-    input: torch.Tensor, target: torch.Tensor, min_precision: float
+    input: torch.Tensor,
+    target: torch.Tensor,
+    min_precision: float,
+    weights: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    precision, recall, threshold = _binary_precision_recall_curve_compute(input, target)
+    precision, recall, threshold = _binary_precision_recall_curve_compute(
+        input, target, weights
+    )
     return _recall_at_precision(precision, recall, threshold, min_precision)
 
 
