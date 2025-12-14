@@ -37,15 +37,16 @@ class TestBinaryAUROC(MetricClassTester):
         weight_tensors = weight.reshape(-1, 1) if weight is not None else None
 
         if compute_result is None:
-            compute_result = (
-                torch.tensor(
-                    roc_auc_score(
-                        target_tensors, input_tensors, sample_weight=weight_tensors
-                    )
-                )
+            score = (
+                roc_auc_score(target_tensors, input_tensors, sample_weight=weight_tensors)
                 if weight_tensors is not None
-                else torch.tensor(roc_auc_score(target_tensors, input_tensors))
+                else roc_auc_score(target_tensors, input_tensors)
             )
+            compute_result = torch.tensor(score, dtype=torch.float64)
+
+
+
+
         if weight is not None:
             self.run_class_implementation_tests(
                 metric=BinaryAUROC(num_tasks=num_tasks, use_fbgemm=use_fbgemm),
@@ -147,7 +148,10 @@ class TestBinaryAUROC(MetricClassTester):
                 torch.cat(update_target, dim=0),
                 torch.cat(update_input, dim=0),
                 sample_weight=torch.cat(update_weight, dim=0),
+
             ),
+                dtype=torch.float64,
+
         )
 
         self.run_class_implementation_tests(
