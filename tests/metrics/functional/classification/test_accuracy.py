@@ -117,10 +117,15 @@ class TestMultiClassAccuracy(unittest.TestCase):
         target_flattened = target.flatten()
         accuracy_per_class = np.empty(num_classes)
         for i in range(num_classes):
-            accuracy_per_class[i] = accuracy_score(
-                target_flattened[target_flattened == i].numpy(),
-                input_flattened[target_flattened == i].numpy(),
-            )
+            mask = target_flattened == i
+            if mask.sum().item() == 0:
+                accuracy_per_class[i] = np.nan
+            else:
+                accuracy_per_class[i] = accuracy_score(
+                    target_flattened[mask].numpy(),
+                    input_flattened[mask].numpy(),
+                )
+
 
         torch.testing.assert_close(
             multiclass_accuracy(
