@@ -11,6 +11,10 @@ import unittest
 import numpy as np
 import torch
 from torcheval.metrics import FrechetAudioDistance
+import pytest
+
+pytest.importorskip("torchaudio.prototype.pipelines")
+
 
 
 # pyre-fixme[24]: Generic type `np.ndarray` expects 2 type parameters.
