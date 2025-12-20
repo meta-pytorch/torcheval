@@ -160,14 +160,14 @@ class RetrievalPrecision(Metric[torch.Tensor]):
         rp = []
         for i in range(self.num_queries):
             if not len(self.target[i]):
-                rp.append(torch.tensor([torch.nan]))
+                rp.append(torch.tensor([torch.nan], device=self.device))
             elif 1 not in self.target[i]:
                 if self.empty_target_action == "pos":
-                    rp.append(torch.tensor([1.0]))
+                    rp.append(torch.tensor([1.0], device=self.device))
                 elif self.empty_target_action == "neg":
-                    rp.append(torch.tensor([0.0]))
+                    rp.append(torch.tensor([0.0], device=self.device))
                 elif self.empty_target_action == "skip":
-                    rp.append(torch.tensor([torch.nan]))
+                    rp.append(torch.tensor([torch.nan], device=self.device))
                 elif self.empty_target_action == "err":
                     raise ValueError(
                         f"no positive value found in target={self.target[i]}."
@@ -178,7 +178,7 @@ class RetrievalPrecision(Metric[torch.Tensor]):
                         self.topk[i], self.target[i], self.k, self.limit_k_to_size
                     ).reshape(-1)
                 )
-        rp = torch.cat(rp).to(self.device)
+        rp = torch.cat(rp)
         if self.avg == "macro":
             return rp.nanmean()
         else:
@@ -195,11 +195,9 @@ class RetrievalPrecision(Metric[torch.Tensor]):
             metrics (Iterable[Metric]): metric instances whose states are to be merged.
         """
         for i in range(self.num_queries):
-            self.topk[i] = torch.cat([self.topk[i]] + [m.topk[i] for m in metrics]).to(
-                self.device
-            )
-            self.target[i] = torch.cat(
-                [self.target[i]] + [m.target[i] for m in metrics]
-            ).to(self.device)
+            metic_topk = torch.cat([m.topk[i] for m in metrics]).to(self.device)
+            self.topk[i] = torch.cat([self.topk[i], metic_topk])
+            metric_target = torch.cat([m.target[i] for m in metrics]).to(self.device)
+            self.target[i] = torch.cat([self.target[i], metric_target])
 
         return self

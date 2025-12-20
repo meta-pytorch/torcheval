@@ -232,7 +232,6 @@ class TestRetrievalPrecision(MetricClassTester):
                 )
 
     # TODO: investigate why this test fails
-    @unittest.skip("Known issue with test. Temporarily skip the test.")
     def test_retrieval_precision_multiple_updates_n_queries_with_nan(
         self,
     ) -> None:
