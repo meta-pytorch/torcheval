@@ -67,7 +67,7 @@ from torcheval.metrics.ranking import (
     RetrievalRecall,
     WeightedCalibration,
 )
-from torcheval.metrics.regression import MeanSquaredError, R2Score
+from torcheval.metrics.regression import MeanSquaredError, R2Score, PearsonCorrelationCoefficient
 
 from torcheval.metrics.text import (
     BLEUScore,
@@ -132,6 +132,7 @@ __all__ = [
     "MultilabelBinnedPrecisionRecallCurve",
     "MultilabelPrecisionRecallCurve",
     "MultilabelRecallAtFixedPrecision",
+    "PearsonCorrelationCoefficient",
     "PeakSignalNoiseRatio",
     "Perplexity",
     "TopKMultilabelAccuracy",

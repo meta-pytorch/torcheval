@@ -8,6 +8,7 @@
 
 from torcheval.metrics.regression.mean_squared_error import MeanSquaredError
 from torcheval.metrics.regression.r2_score import R2Score
+from torcheval.metrics.regression.pearson_correlation_coefficient import PearsonCorrelationCoefficient
 
-__all__ = ["MeanSquaredError", "R2Score"]
+__all__ = ["MeanSquaredError", "PearsonCorrelationCoefficient", "R2Score"]
 __doc_name__ = "Regression Metrics"

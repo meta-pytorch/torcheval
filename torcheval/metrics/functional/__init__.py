@@ -52,7 +52,7 @@ from torcheval.metrics.functional.ranking import (
     retrieval_recall,
     weighted_calibration,
 )
-from torcheval.metrics.functional.regression import mean_squared_error, r2_score
+from torcheval.metrics.functional.regression import mean_squared_error, r2_score, pearson_correlation_coefficient
 from torcheval.metrics.functional.text import (
     bleu_score,
     perplexity,
@@ -101,6 +101,7 @@ __all__ = [
     "multilabel_precision_recall_curve",
     "multilabel_recall_at_fixed_precision",
     "num_collisions",
+    "pearson_correlation_coefficient",
     "peak_signal_noise_ratio",
     "perplexity",
     "r2_score",

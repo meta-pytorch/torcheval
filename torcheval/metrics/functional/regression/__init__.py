@@ -14,5 +14,9 @@ from torcheval.metrics.functional.regression.mean_squared_error import (
 
 from torcheval.metrics.functional.regression.r2_score import r2_score
 
-__all__ = ["mean_squared_error", "r2_score"]
+from torcheval.metrics.functional.regression.pearson_correlation_coefficient import (
+    pearson_correlation_coefficient,
+)
+
+__all__ = ["mean_squared_error", "pearson_correlation_coefficient", "r2_score"]
 __doc_name__ = "Regression Metrics"
