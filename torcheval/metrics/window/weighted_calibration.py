@@ -17,6 +17,7 @@ from torcheval.metrics.functional.ranking.weighted_calibration import (
     _weighted_calibration_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TWindowedWeightedCalibration = TypeVar("TWindowedWeightedCalibration")
 
@@ -85,21 +86,22 @@ class WindowedWeightedCalibration(
         self.enable_lifetime = enable_lifetime
         self.next_inserted = 0
         self._add_state("total_updates", 0)
+        dtype = largest_float(device)
         if self.enable_lifetime:
             self._add_state(
                 "weighted_input_sum",
-                torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+                torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
             )
             self._add_state(
                 "weighted_target_sum",
-                torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+                torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
             )
         self._add_state(
             "windowed_weighted_input_sum",
             torch.zeros(
                 self.num_tasks,
                 self.max_num_updates,
-                dtype=torch.float64,
+                dtype=dtype,
                 device=self.device,
             ),
         )
@@ -108,7 +110,7 @@ class WindowedWeightedCalibration(
             torch.zeros(
                 self.num_tasks,
                 self.max_num_updates,
-                dtype=torch.float64,
+                dtype=dtype,
                 device=self.device,
             ),
         )
@@ -156,17 +158,19 @@ class WindowedWeightedCalibration(
             Tensor: The return value of weighted calibration for each task (num_tasks,).
         """
         if self.total_updates == 0:
+            naught = torch.empty(0, device=self.device)
             if self.enable_lifetime:
-                return torch.empty(0), torch.empty(0)
+                return naught, naught
             else:
-                return torch.empty(0)
+                return naught
         # for the case the winodw has been filled more than once
+        dtype = largest_float(self.device)
         if self.total_updates >= self.max_num_updates:
             windowed_weighted_calibration = self.windowed_weighted_input_sum.sum(
                 dim=-1
             ) / torch.clamp(
                 self.windowed_weighted_target_sum.sum(dim=-1),
-                min=torch.finfo(torch.float64).eps,
+                min=torch.finfo(dtype).eps,
             )
         else:
             # for the situation when window array hasn't been filled up
@@ -174,11 +178,11 @@ class WindowedWeightedCalibration(
                 :, : self.next_inserted
             ].sum(dim=-1) / torch.clamp(
                 self.windowed_weighted_target_sum[:, : self.next_inserted].sum(dim=-1),
-                min=torch.finfo(torch.float64).eps,
+                min=torch.finfo(dtype).eps,
             )
         if self.enable_lifetime:
             self.weighted_target_sum = torch.clamp(
-                self.weighted_target_sum, min=torch.finfo(torch.float64).eps
+                self.weighted_target_sum, min=torch.finfo(dtype).eps
             )
             weighted_calibration = self.weighted_input_sum / self.weighted_target_sum
             return weighted_calibration, windowed_weighted_calibration
@@ -201,16 +205,17 @@ class WindowedWeightedCalibration(
         cur_windowed_weighted_input_sum = self.windowed_weighted_input_sum
         cur_windowed_weighted_target_sum = self.windowed_weighted_target_sum
         idx = min(self.total_updates, self.max_num_updates)
+        dtype = largest_float(self.device)
         self.windowed_weighted_input_sum = torch.zeros(
             self.num_tasks,
             merge_max_num_updates,
-            dtype=torch.float64,
+            dtype=dtype,
             device=self.device,
         )
         self.windowed_weighted_target_sum = torch.zeros(
             self.num_tasks,
             merge_max_num_updates,
-            dtype=torch.float64,
+            dtype=dtype,
             device=self.device,
         )
         self.windowed_weighted_input_sum[:, :idx] = cur_windowed_weighted_input_sum[

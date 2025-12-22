@@ -62,7 +62,7 @@ def multiclass_f1_score(
     Compute f1 score, which is defined as the harmonic mean of precision and recall.
     We convert NaN to zero when f1 score is NaN. This happens when either precision
     or recall is NaN or when both precision and recall are zero.
-    Its class version is ``torcheval.metrics.MultiClassF1Score``.
+    Its class version is :obj:`torcheval.metrics.MulticlassF1Score`.
     See also :func:`binary_f1_score <torcheval.metrics.functional.binary_f1_score>`
 
     Args:
@@ -181,14 +181,14 @@ def _update(
 
     # Add this line to bypass torch jit datatype checking
     assert isinstance(num_classes, int)
-    num_label = torch.zeros(num_classes, device=target.device).scatter_(
-        0, target, 1, reduce="add"
+    num_label = target.new_zeros(num_classes).scatter_add_(
+        0, target, torch.ones_like(target)
     )
-    num_prediction = torch.zeros(num_classes, device=target.device).scatter_(
-        0, input, 1, reduce="add"
+    num_prediction = target.new_zeros(num_classes).scatter_add_(
+        0, input, torch.ones_like(input)
     )
-    num_tp = torch.zeros(num_classes, device=target.device).scatter_(
-        0, target[input == target], 1, reduce="add"
+    num_tp = target.new_zeros(num_classes).scatter_add_(
+        0, target[input == target], torch.ones_like(target)
     )
     return num_tp, num_label, num_prediction
 

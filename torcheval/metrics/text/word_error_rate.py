@@ -18,6 +18,7 @@ from torcheval.metrics.functional.text.word_error_rate import (
     _word_error_rate_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TWordErrorRate = TypeVar("TWordErrorRate")
 
@@ -53,10 +54,9 @@ class WordErrorRate(Metric[torch.Tensor]):
         device: torch.device | None = None,
     ) -> None:
         super().__init__(device=device)
-        self._add_state(
-            "errors", torch.tensor(0, dtype=torch.float, device=self.device)
-        )
-        self._add_state("total", torch.tensor(0, dtype=torch.float, device=self.device))
+        dtype = largest_float(device)
+        self._add_state("errors", torch.tensor(0, dtype=dtype, device=self.device))
+        self._add_state("total", torch.tensor(0, dtype=dtype, device=self.device))
 
     @torch.inference_mode()
     # pyre-ignore[14]: `update` overrides method defined in `Metric` inconsistently.
@@ -72,7 +72,7 @@ class WordErrorRate(Metric[torch.Tensor]):
             input (str, List[str]): Predicted word sequence(s) to score as a string or list of strings.
             target (str, List[str]): Reference word sequence(s) as a string or list of strings.
         """
-        errors, total = _word_error_rate_update(input, target)
+        errors, total = _word_error_rate_update(input, target, self.device)
         self.errors += errors
         self.total += total
         return self

@@ -76,6 +76,7 @@ if __name__ == "__main__":
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
         ],
         extras_require={
+            "audio": read_requirements("audio-requirements.txt"),
             "dev": read_requirements("dev-requirements.txt"),
             "image": read_requirements("image-requirements.txt"),
         },

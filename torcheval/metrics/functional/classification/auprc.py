@@ -25,7 +25,7 @@ def binary_auprc(
 ) -> torch.Tensor:
     r"""
     Compute AUPRC, also called Average Precision, which is the area under the Precision-Recall Curve, for binary classification.
-    Its class version is ``torcheval.metrics.BinaryAUPRC``.
+    Its class version is :obj:`torcheval.metrics.BinaryAUPRC`.
 
     Precision is defined as :math:`\frac{T_p}{T_p+F_p}`; it is the probability that a positive prediction from the model is a true positive.
     Recall is defined as :math:`\frac{T_p}{T_p+F_n}`; it is the probability that a true positive is predicted to be positive by the model.
@@ -79,7 +79,7 @@ def multiclass_auprc(
 ) -> torch.Tensor:
     r"""
     Compute AUPRC, also called Average Precision, which is the area under the Precision-Recall Curve, for multiclass classification.
-    Its class version is ``torcheval.metrics.MulticlassAUPRC``.
+    Its class version is :obj:`torcheval.metrics.MulticlassAUPRC`.
 
     Precision is defined as :math:`\frac{T_p}{T_p+F_p}`; it is the probability that a positive prediction from the model is a true positive.
     Recall is defined as :math:`\frac{T_p}{T_p+F_n}`; it is the probability that a true positive is predicted to be positive by the model.
@@ -159,7 +159,7 @@ def multilabel_auprc(
 ) -> torch.Tensor:
     r"""
     Compute AUPRC, also called Average Precision, which is the area under the Precision-Recall Curve, for multilabel classification.
-    Its class version is ``torcheval.metrics.MultilabelAUPRC``.
+    Its class version is :obj:`torcheval.metrics.MultilabelAUPRC`.
 
     Precision is defined as :math:`\frac{T_p}{T_p+F_p}`, it is the probability that a positive prediction from the model is a true positive.
     Recall is defined as :math:`\frac{T_p}{T_p+F_n}`, it is the probability that a true positive is predicted to be positive by the model.

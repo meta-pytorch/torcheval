@@ -10,3 +10,4 @@ from torcheval.metrics.audio.fad import FrechetAudioDistance
 
 
 __all__ = ["FrechetAudioDistance"]
+__doc_name__ = "Audio Metrics"

@@ -10,6 +10,7 @@
 import torch
 from torch.nn import functional as F
 from torcheval.metrics.functional.tensor_utils import _create_threshold_tensor
+from torcheval.utils.device import largest_float
 
 DEFAULT_NUM_THRESHOLD = 200
 
@@ -24,7 +25,7 @@ def binary_binned_auroc(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Compute AUROC, which is the area under the ROC Curve, for binary classification.
-    Its class version is ``torcheval.metrics.BinaryBinnedAUROC``.
+    Its class version is :obj:`torcheval.metrics.BinaryBinnedAUROC`.
     See also :func:`multiclass_binned_auroc <torcheval.metrics.functional.multiclass_binned_auroc>`
 
     Args:
@@ -133,7 +134,7 @@ def _binary_binned_auroc_compute(
     auroc = torch.where(
         factor == 0,
         0.5,
-        torch.trapz(cum_tp, cum_fp).double() / factor,
+        torch.trapz(cum_tp, cum_fp).type(largest_float(target.device)) / factor,
     )
     return auroc, threshold
 

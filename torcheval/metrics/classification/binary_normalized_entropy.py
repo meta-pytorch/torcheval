@@ -18,6 +18,7 @@ from torcheval.metrics.functional.classification.binary_normalized_entropy impor
     _binary_normalized_entropy_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TNormalizedEntropy = TypeVar("TNormalizedEntropy")
 
@@ -76,17 +77,18 @@ class BinaryNormalizedEntropy(Metric[torch.Tensor]):
                 "`num_tasks` value should be greater than and equal to 1, but received {num_tasks}. "
             )
         self.num_tasks = num_tasks
+        dtype = largest_float(device)
         self._add_state(
             "total_entropy",
-            torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+            torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
         )
         self._add_state(
             "num_examples",
-            torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+            torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
         )
         self._add_state(
             "num_positive",
-            torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+            torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
         )
 
     @torch.inference_mode()

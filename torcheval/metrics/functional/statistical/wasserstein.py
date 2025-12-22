@@ -21,7 +21,7 @@ def wasserstein_1d(
 
     The Wasserstein distance between two distributions is intuitively the
     minimum weight of soil (times distance moved) that would need to be moved
-    if the two distributions were represented by two piles of soil.
+    if the two distributions were represented by two piles of soil. [1]_
 
     Args
     ----------
@@ -70,7 +70,7 @@ def wasserstein_1d(
     ----------
     .. [1] "Wasserstein metric", https://en.wikipedia.org/wiki/Wasserstein_metric
     .. [2] Ramdas, Garcia, Cuturi "On Wasserstein Two Sample Testing and Related
-           Families of Nonparametric Tests" (2015). :arXiv:`1509.02237`.
+           Families of Nonparametric Tests" (2015), https://arxiv.org/abs/1509.02237
 
     Examples
     --------

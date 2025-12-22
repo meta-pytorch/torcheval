@@ -18,6 +18,7 @@ from torcheval.metrics.functional.text.word_information_preserved import (
     _word_information_preserved_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TWordInformationPreserved = TypeVar("TWordInformationPreserved")
 
@@ -52,13 +53,16 @@ class WordInformationPreserved(Metric[torch.Tensor]):
     ) -> None:
         super().__init__(device=device)
         self._add_state(
-            "correct_total", torch.tensor(0, dtype=torch.float64, device=self.device)
+            "correct_total",
+            torch.tensor(0, dtype=largest_float(device), device=self.device),
         )
         self._add_state(
-            "input_total", torch.tensor(0, dtype=torch.float64, device=self.device)
+            "input_total",
+            torch.tensor(0, dtype=largest_float(device), device=self.device),
         )
         self._add_state(
-            "target_total", torch.tensor(0, dtype=torch.float64, device=self.device)
+            "target_total",
+            torch.tensor(0, dtype=largest_float(device), device=self.device),
         )
 
     @torch.inference_mode()
@@ -76,11 +80,11 @@ class WordInformationPreserved(Metric[torch.Tensor]):
             target (str, List[str]): Reference word sequence(s) as a string or list of strings.
         """
         correct_total, target_total, input_total = _word_information_preserved_update(
-            input, target
+            input, target, self.device
         )
-        self.correct_total += correct_total.to(self.device)
-        self.target_total += target_total.to(self.device)
-        self.input_total += input_total.to(self.device)
+        self.correct_total += correct_total
+        self.target_total += target_total
+        self.input_total += input_total
         return self
 
     @torch.inference_mode()

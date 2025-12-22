@@ -69,6 +69,8 @@ from torcheval.metrics.ranking import (
 )
 from torcheval.metrics.regression import MeanSquaredError, R2Score
 
+from torcheval.metrics.statistical import Wasserstein1D
+
 from torcheval.metrics.text import (
     BLEUScore,
     Perplexity,
@@ -142,6 +144,7 @@ __all__ = [
     "StructuralSimilarity",
     "Sum",
     "Throughput",
+    "Wasserstein1D",
     "WeightedCalibration",
     "WindowedBinaryAUROC",
     "WindowedBinaryNormalizedEntropy",

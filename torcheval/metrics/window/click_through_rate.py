@@ -18,6 +18,7 @@ from torcheval.metrics.functional.ranking.click_through_rate import (
     _click_through_rate_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 
 TWindowedClickThroughRate = TypeVar("TWindowedClickThroughRate")
@@ -32,7 +33,7 @@ class WindowedClickThroughRate(
     Lifetime value is calculated from all past input and target of `update()` calls.
 
     Compute the click through rate given click events.
-    Its functional version is ``torcheval.metrics.functional.click_through_rate``.
+    Its functional version is :func:`torcheval.metrics.functional.click_through_rate`.
 
     Args:
         num_tasks (int): Number of tasks that need click through rate calculation. Default value
@@ -50,7 +51,14 @@ class WindowedClickThroughRate(
         >>> metric.update(torch.tensor([0, 1, 0, 1, 1, 1, 1, 1]))
         >>> metric.update(torch.tensor([0, 1, 0, 1, 0, 0, 0, 1]))
         >>> metric.compute()
-        tensor([0.5625])
+        (tensor([0.5417], dtype=torch.float64), tensor([0.5625], dtype=torch.float64))
+
+        >>> metric = WindowedClickThroughRate(max_num_updates=2, enable_lifetime=False)
+        >>> metric.update(torch.tensor([0, 1, 0, 1, 1, 0, 0, 1]))
+        >>> metric.update(torch.tensor([0, 1, 0, 1, 1, 1, 1, 1]))
+        >>> metric.update(torch.tensor([0, 1, 0, 1, 0, 0, 0, 1]))
+        >>> metric.compute()
+        tensor([0.5625], dtype=torch.float64)
 
     """
 
@@ -76,21 +84,22 @@ class WindowedClickThroughRate(
         self.next_inserted = 0
         self.enable_lifetime = enable_lifetime
         self._add_state("total_updates", 0)
+        dtype = largest_float(device)
         if self.enable_lifetime:
             self._add_state(
                 "click_total",
-                torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+                torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
             )
             self._add_state(
                 "weight_total",
-                torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+                torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
             )
         self._add_state(
             "windowed_click_total",
             torch.zeros(
                 self.num_tasks,
                 self.max_num_updates,
-                dtype=torch.float64,
+                dtype=dtype,
                 device=self.device,
             ),
         )
@@ -99,7 +108,7 @@ class WindowedClickThroughRate(
             torch.zeros(
                 self.num_tasks,
                 self.max_num_updates,
-                dtype=torch.float64,
+                dtype=dtype,
                 device=self.device,
             ),
         )
@@ -141,10 +150,11 @@ class WindowedClickThroughRate(
         ``compute()`` is called, return tensor(0.0).
         """
         if self.total_updates == 0:
+            naught = torch.empty(0, device=self.device)
             if self.enable_lifetime:
-                return torch.empty(0), torch.empty(0)
+                return naught, naught
             else:
-                return torch.empty(0)
+                return naught
 
         # For the case that window has been filled more than once
         if self.total_updates >= self.max_num_updates:
@@ -187,16 +197,17 @@ class WindowedClickThroughRate(
         cur_click_total = self.windowed_click_total
         cur_weight_total = self.windowed_weight_total
 
+        dtype = largest_float(self.device)
         self.windowed_click_total = torch.zeros(
             self.num_tasks,
             merge_max_num_updates,
-            dtype=torch.float64,
+            dtype=dtype,
             device=self.device,
         )
         self.windowed_weight_total = torch.zeros(
             self.num_tasks,
             merge_max_num_updates,
-            dtype=torch.float64,
+            dtype=dtype,
             device=self.device,
         )
 

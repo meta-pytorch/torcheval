@@ -30,7 +30,7 @@ class TestWordErrorRate(MetricClassTester):
                     ["hello metaverse", "welcome to meta"],
                 ],
             },
-            compute_result=torch.tensor(0.6),
+            compute_result=torch.tensor(0.6, dtype=torch.float64),
             num_total_updates=4,
         )
 

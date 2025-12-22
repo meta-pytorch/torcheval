@@ -18,6 +18,7 @@ from torcheval.metrics.functional.ranking.click_through_rate import (
     _click_through_rate_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 
 TClickThroughRate = TypeVar("TClickThroughRate")
@@ -26,7 +27,7 @@ TClickThroughRate = TypeVar("TClickThroughRate")
 class ClickThroughRate(Metric[torch.Tensor]):
     """
     Compute the click through rate given click events.
-    Its functional version is ``torcheval.metrics.functional.click_through_rate``.
+    Its functional version is :func:`torcheval.metrics.functional.click_through_rate`.
 
     Args:
         num_tasks (int): Number of tasks that need weighted_calibration calculation. Default value
@@ -67,13 +68,14 @@ class ClickThroughRate(Metric[torch.Tensor]):
                 "`num_tasks` value should be greater than and equal to 1, but received {num_tasks}. "
             )
         self.num_tasks = num_tasks
+        dtype = largest_float(device)
         self._add_state(
             "click_total",
-            torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+            torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
         )
         self._add_state(
             "weight_total",
-            torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+            torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
         )
 
     @torch.inference_mode()

@@ -11,6 +11,8 @@ from copy import deepcopy
 import torch
 import torch.nn.functional as F
 
+from torcheval.utils.device import largest_float
+
 
 @torch.inference_mode()
 def perplexity(
@@ -90,7 +92,8 @@ def _perplexity_update(
 
     _perplexity_input_check(input, target, ignore_index)
 
-    probs = input.reshape(-1, input.shape[-1])
+    dtype = largest_float(target.device)
+    probs = input.reshape(-1, input.shape[-1]).type(dtype)
     probs = F.softmax(probs, dim=1)
 
     target = target.reshape(-1)
@@ -112,7 +115,7 @@ def _perplexity_compute(
     sum_log_probs: torch.Tensor,
     num_total: torch.Tensor,
 ) -> torch.Tensor:
-    return torch.exp(sum_log_probs / num_total).double()
+    return torch.exp(sum_log_probs / num_total)
 
 
 def _perplexity_input_check(

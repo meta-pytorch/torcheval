@@ -21,7 +21,7 @@ def bleu_score(
 ) -> torch.Tensor:
     """
     Compute BLEU score given translations and references for each translation.
-    Its class version is ``torcheval.metrics.texBLEUScore``.
+    Its class version is :obj:`torcheval.metrics.BLEUScore`.
 
     Args:
         input: Translations to score.
@@ -32,7 +32,7 @@ def bleu_score(
 
         Examples:
             >>> import torch
-            >>> from torcheval.metrics.functional.text import bleu
+            >>> from torcheval.metrics.functional import bleu_score
             >>> candidates = ["the squirrel is eating the nut"]
             >>> references = [["a squirrel is eating a nut", "the squirrel is eating a tasty nut"]]
             >>> bleu_score(candidates, references, n_gram=4)

@@ -9,7 +9,9 @@ linting, testing, and building the documentation, run the following:
 git clone https://github.com/pytorch/torcheval
 cd torcheval
 pip install -r requirements.txt
+pip install -r audio-requirements.txt
 pip install -r dev-requirements.txt
+pip install -r image-requirements.txt
 pip install -r docs/requirements.txt
 pip install --no-build-isolation -e ".[dev]"
 ```

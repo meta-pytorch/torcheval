@@ -17,7 +17,7 @@ def sum(
 ) -> torch.Tensor:
     """
     Compute weighted sum. When weight is not provided, it calculates the unweighted sum.
-    Its class version is ``torcheval.metrics.Sum``.
+    Its class version is :obj:`torcheval.metrics.Sum`.
 
     Args:
         input (Tensor): Tensor of input values.

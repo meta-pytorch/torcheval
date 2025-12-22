@@ -24,7 +24,7 @@ def binary_precision(
     """
     Compute precision score for binary classification class, which is calculated as the ratio between the number of
     true positives (TP) and the total number of predicted positives (TP + FP).
-    Its class version is ``torcheval.metrics.BinaryPrecision``.
+    Its class version is :obj:`torcheval.metrics.BinaryPrecision`.
     See also :func:`multiclass_precision <torcheval.metrics.functional.multiclass_precision>`
 
     Args:
@@ -64,7 +64,7 @@ def multiclass_precision(
     """
     Compute precision score, which is the ratio of the true positives (TP) and the
     total number of points classified as positives (TP + FP).
-    Its class version is ``torcheval.metrics.MultiClassPrecision``.
+    Its class version is :obj:`torcheval.metrics.MulticlassPrecision`.
     See also :func:`binary_precision <torcheval.metrics.functional.binary_precision>`
 
     Args:
@@ -129,12 +129,14 @@ def _precision_update(
         num_fp = (input != target).sum()
         return num_tp, num_fp, torch.tensor(0.0)
 
-    num_label = target.new_zeros(num_classes).scatter_(0, target, 1, reduce="add")
-    num_tp = target.new_zeros(num_classes).scatter_(
-        0, target[input == target], 1, reduce="add"
+    num_label = target.new_zeros(num_classes).scatter_add_(
+        0, target, torch.ones_like(target)
     )
-    num_fp = target.new_zeros(num_classes).scatter_(
-        0, input[input != target], 1, reduce="add"
+    num_tp = target.new_zeros(num_classes).scatter_add_(
+        0, target[input == target], torch.ones_like(target)
+    )
+    num_fp = target.new_zeros(num_classes).scatter_add_(
+        0, input[input != target], torch.ones_like(target)
     )
 
     return num_tp, num_fp, num_label

@@ -17,7 +17,7 @@ def mean(
 ) -> torch.Tensor:
     """
     Compute weighted mean. When weight is not provided, it calculates the unweighted mean.
-    Its class version is ``torcheval.metrics.Mean``.
+    Its class version is :obj:`torcheval.metrics.Mean`.
 
     weighted_mean = sum(weight * input) / sum(weight)
 

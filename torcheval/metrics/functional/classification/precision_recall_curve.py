@@ -25,7 +25,7 @@ def binary_precision_recall_curve(
     binary classification tasks. If a class is missing from the target tensor,
     its recall values are set to 1.0.
 
-    Its class version is ``torcheval.metrics.BinaryPrecisionRecallCurve``.
+    Its class version is :obj:`torcheval.metrics.BinaryPrecisionRecallCurve`.
     See also :func:`multiclass_precision_recall_curve <torcheval.metrics.functional.multiclass_precision_recall_curve>`, :func:`multilabel_precision_recall_curve <torcheval.metrics.functional.multilabel_precision_recall_curve>`
 
     Args:
@@ -104,7 +104,7 @@ def multiclass_precision_recall_curve(
     multi-class classification tasks. If a class is missing from the target
     tensor, its recall values are set to 1.0.
 
-    Its class version is ``torcheval.metrics.MulticlassPrecisionRecallCurve``.
+    Its class version is :obj:`torcheval.metrics.MulticlassPrecisionRecallCurve`.
     See also :func:`binary_precision_recall_curve <torcheval.metrics.functional.binary_precision_recall_curve>`, :func:`multilabel_precision_recall_curve <torcheval.metrics.functional.multilabel_precision_recall_curve>`
 
     Args:
@@ -258,7 +258,7 @@ def multilabel_precision_recall_curve(
     multi-label classification tasks. If there are no samples for a label
     in the target tensor, its recall values are set to 1.0.
 
-    Its class version is ``torcheval.metrics.MultilabelPrecisionRecallCurve``.
+    Its class version is :obj:`torcheval.metrics.MultilabelPrecisionRecallCurve`.
     See also :func:`binary_precision_recall_curve <torcheval.metrics.functional.binary_precision_recall_curve>`, :func:`multiclass_precision_recall_curve <torcheval.metrics.functional.multiclass_precision_recall_curve>`
 
     Args:

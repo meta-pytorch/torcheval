@@ -169,10 +169,11 @@ class WindowedMeanSquaredError(
         Empty tensor is returned if no calls to ``update()`` are made before ``compute()`` is called.
         """
         if self.total_updates == 0:
+            naught = torch.empty(0, device=self.device)
             if self.enable_lifetime:
-                return torch.empty(0), torch.empty(0)
+                return naught, naught
             else:
-                return torch.empty(0)
+                return naught
 
         windowed_sum_squared_error = self.windowed_sum_squared_error.sum(dim=1)
         windowed_sum_weight = self.windowed_sum_weight.sum(dim=1)

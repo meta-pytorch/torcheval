@@ -21,6 +21,7 @@ from torcheval.metrics.functional.classification.auroc import (
     _multiclass_auroc_update_input_check,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 try:
     import fbgemm_gpu.metrics  # noqa
@@ -113,7 +114,7 @@ class BinaryAUROC(Metric[torch.Tensor]):
         target = target.to(self.device)
 
         if weight is None:
-            weight = torch.ones_like(input, dtype=torch.double)
+            weight = torch.ones_like(input, dtype=largest_float(self.device))
         _binary_auroc_update_input_check(input, target, self.num_tasks, weight)
         self.inputs.append(input)
         self.targets.append(target)

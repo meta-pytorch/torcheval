@@ -10,6 +10,8 @@
 import torch
 import torch.nn.functional as F
 
+from torcheval.utils.device import largest_float
+
 
 @torch.inference_mode()
 def binary_normalized_entropy(
@@ -23,7 +25,7 @@ def binary_normalized_entropy(
     """
     Compute the normalized binary cross entropy between predicted input and
     ground-truth binary target.
-    Its class version is ``torcheval.metrics.binary_normalized_entropy``
+    Its class version is :obj:`torcheval.metrics.BinaryNormalizedEntropy`.
 
     Args:
         input (Tensor): Predicted unnormalized scores (often referred to as logits) or
@@ -70,7 +72,7 @@ def binary_normalized_entropy(
     )
     cross_entropy /= num_examples
     baseline_entropy = _baseline_update(num_positive, num_examples)
-    return (cross_entropy / baseline_entropy).double()
+    return (cross_entropy / baseline_entropy).type(largest_float(target.device))
 
 
 def _binary_normalized_entropy_update(
@@ -98,19 +100,23 @@ def _update(
         cross_entropy = F.binary_cross_entropy(
             input, target, weight, reduction="none"
         ).sum(dim=-1)
-    weight = target.new_ones(target.size()) * 1.0 if weight is None else weight
-    num_examples = torch.sum(weight, dim=-1).double()
-    num_positive = torch.sum(weight * target, dim=-1).double()
+    dtype = largest_float(target.device)
+    weight = (
+        torch.ones_like(target, dtype=dtype) if weight is None else weight.type(dtype)
+    )
+    num_examples = torch.sum(weight, dim=-1)
+    num_positive = torch.sum(weight * target, dim=-1)
     return cross_entropy, num_positive, num_examples
 
 
 def _baseline_update(
     num_positive: torch.Tensor, num_examples: torch.Tensor
 ) -> torch.Tensor:
+    dtype = num_positive.dtype
     base_pos_rate = torch.clamp(
         (num_positive / num_examples),
-        min=torch.finfo(torch.float64).eps,
-        max=1 - torch.finfo(torch.float64).eps,
+        min=torch.finfo(dtype).eps,
+        max=1 - torch.finfo(dtype).eps,
     )
     baseline_entropy = -base_pos_rate * torch.log(base_pos_rate) - (
         1 - base_pos_rate

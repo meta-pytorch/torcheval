@@ -15,6 +15,7 @@ from torcheval.metrics.functional.classification.precision_recall_curve import (
     _multilabel_precision_recall_curve_update_input_check,
 )
 from torcheval.metrics.functional.tensor_utils import _create_threshold_tensor
+from torcheval.utils.device import largest_float
 
 
 @torch.inference_mode()
@@ -26,7 +27,7 @@ def binary_binned_precision_recall_curve(
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Compute precision recall curve with given thresholds.
-    Its class version is ``torcheval.metrics.BinaryBinnedPrecisionRecallCurve``.
+    Its class version is :obj:`torcheval.metrics.BinaryBinnedPrecisionRecallCurve`.
     See also :func:`multiclass_binned_precision_recall_curve <torcheval.metrics.functional.multiclass_binned_precision_recall_curve>`
 
     Args:
@@ -93,7 +94,7 @@ def _update(
     # (index, target) values, stored as 2 * index + target
     index_target = (
         2 * (torch.searchsorted(threshold, input, right=True) - 1) + target
-    ).type(torch.float64)
+    ).type(largest_float(target.device))
     hist = torch.histc(
         index_target, bins=2 * num_thresholds, min=0, max=2 * num_thresholds
     )
@@ -140,7 +141,7 @@ def multiclass_binned_precision_recall_curve(
 ) -> tuple[list[torch.Tensor], list[torch.Tensor], torch.Tensor]:
     """
     Compute precision recall curve with given thresholds.
-    Its class version is ``torcheval.metrics.MulticlassBinnedPrecisionRecallCurve``.
+    Its class version is :obj:`torcheval.metrics.MulticlassBinnedPrecisionRecallCurve`.
     See also :func:`binary_binned_precision_recall_curve <torcheval.metrics.functional.binary_binned_precision_recall_curve>`
 
     Args:
@@ -256,6 +257,7 @@ def _multiclass_binned_precision_recall_curve_update_memory(
     num_samples, num_classes = tuple(input.shape)
     num_thresholds = len(threshold)
 
+    big_float = largest_float(target.device)
     # false positives are positives_idx[0], true positives are positives_idx[1]
     # For each j, k we find largest i such that input[j,k] >= threshold[i]. We also need to store whether target[j] == k.
     # largest_index: (index, class, target) values, stored as 2 * ((num_classes * index) + class) + target
@@ -265,7 +267,7 @@ def _multiclass_binned_precision_recall_curve_update_memory(
             num_classes * (torch.searchsorted(threshold, input, right=True) - 1)
             + torch.arange(num_classes, device=input.device)
         )
-    ).type(torch.float64)
+    ).type(big_float)
     largest_index[range(num_samples), target] += 1
 
     hist = torch.histc(
@@ -281,7 +283,7 @@ def _multiclass_binned_precision_recall_curve_update_memory(
     )
 
     class_counts = torch.histc(
-        target.type(torch.float64), bins=num_classes, min=0, max=num_classes
+        target.type(big_float), bins=num_classes, min=0, max=num_classes
     ).type(target.dtype)
 
     # suffix sum: For each threshold index/("true/false" positives) combination,
@@ -344,7 +346,7 @@ def multilabel_binned_precision_recall_curve(
 ) -> tuple[list[torch.Tensor], list[torch.Tensor], torch.Tensor]:
     """
     Compute precision recall curve with given thresholds.
-    Its class version is ``torcheval.metrics.MultilabelBinnedPrecisionRecallCurve``.
+    Its class version is :obj:`torcheval.metrics.MultilabelBinnedPrecisionRecallCurve`.
     See also :func:`binary_binned_precision_recall_curve <torcheval.metrics.functional.binary_binned_precision_recall_curve>`,
     :func:`multiclass_precision_recall_curve <torcheval.metrics.functional.multiclass_precision_recall_curve>`
 
@@ -448,7 +450,7 @@ def _multilabel_binned_precision_recall_curve_update_memory(
     """
     _multilabel_precision_recall_curve_update_input_check(input, target, num_labels)
 
-    num_samples, num_labels = tuple(input.shape)
+    _, num_labels = tuple(input.shape)
     num_thresholds = len(threshold)
 
     # For each sample index j and label k, we need:
@@ -465,7 +467,7 @@ def _multilabel_binned_precision_recall_curve_update_memory(
     )
 
     hist = torch.histc(
-        largest_index.type(torch.float64),
+        largest_index.type(largest_float(target.device)),
         bins=2 * num_thresholds * num_labels,
         min=0,
         max=2 * num_thresholds * num_labels,

@@ -58,7 +58,7 @@ def multiclass_accuracy(
 ) -> torch.Tensor:
     """
     Compute accuracy score, which is the frequency of input matching target.
-    Its class version is ``torcheval.metrics.MultiClassAccuracy``.
+    Its class version is :obj:`torcheval.metrics.MulticlassAccuracy`.
     See also :func:`binary_accuracy <torcheval.metrics.functional.binary_accuracy>`, :func:`multilabel_accuracy <torcheval.metrics.functional.multilabel_accuracy>`, :func:`topk_multilabel_accuracy <torcheval.metrics.functional.topk_multilabel_accuracy>`
 
     Args:
@@ -116,7 +116,7 @@ def multilabel_accuracy(
 ) -> torch.Tensor:
     """
     Compute multilabel accuracy score, which is the frequency of input matching target.
-    Its class version is ``torcheval.metrics.MultilabelAccuracy``.
+    Its class version is :obj:`torcheval.metrics.MultilabelAccuracy`.
     See also :func:`binary_accuracy <torcheval.metrics.functional.binary_accuracy>`, :func:`multiclass_accuracy <torcheval.metrics.functional.multiclass_accuracy>`, :func:`topk_multilabel_accuracy <torcheval.metrics.functional.topk_multilabel_accuracy>`
 
     Args:
@@ -187,7 +187,7 @@ def topk_multilabel_accuracy(
 ) -> torch.Tensor:
     """
     Compute multilabel accuracy score, which is the frequency of the top k label predicted matching target.
-    Its class version is ``torcheval.metrics.TopKMultilabelAccuracy``.
+    Its class version is :obj:`torcheval.metrics.TopKMultilabelAccuracy`.
     See also :func:`binary_accuracy <torcheval.metrics.functional.binary_accuracy>`, :func:`multiclass_accuracy <torcheval.metrics.functional.multiclass_accuracy>`, :func:`multilabel_accuracy <torcheval.metrics.functional.multilabel_accuracy>`
 
     Args:
@@ -272,9 +272,11 @@ def _multiclass_accuracy_update(
         return num_correct, num_total
 
     # pyre-ignore[6]: expect int got Optional[int] for num_classes
-    num_correct = mask.new_zeros(num_classes).scatter_(0, target, mask, reduce="add")
+    num_correct = mask.new_zeros(num_classes).scatter_add_(0, target, mask)
     # pyre-ignore[6]: expect int got Optional[int] for num_classes
-    num_total = target.new_zeros(num_classes).scatter_(0, target, 1, reduce="add")
+    num_total = target.new_zeros(num_classes).scatter_add_(
+        0, target, torch.ones_like(target)
+    )
     return num_correct, num_total
 
 

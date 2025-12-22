@@ -19,6 +19,7 @@ from torcheval.metrics.functional.text.word_information_lost import (
 )
 
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TWordInformationLost = TypeVar("TWordInformationLost")
 
@@ -39,12 +40,13 @@ class WordInformationLost(Metric[torch.Tensor]):
     Its functional version is :func:`torcheval.metrics.functional.word_information_lost`.
 
     Examples:
-        >>> from torcheval.metrics.text import WordInformationLost
+        >>> from torcheval.metrics import WordInformationLost
         >>> preds = ["this is the prediction", "there is an other sample"]
         >>> target = ["this is the reference", "there is another one"]
         >>> metric = WordInformationLost()
-        >>> metric(preds, target)
-        tensor(0.6528)
+        >>> metric.update(preds, target)
+        >>> metric.compute()
+        tensor(0.6528, dtype=torch.float64)
     """
 
     def __init__(
@@ -53,13 +55,16 @@ class WordInformationLost(Metric[torch.Tensor]):
     ) -> None:
         super().__init__(device=device)
         self._add_state(
-            "correct_total", torch.tensor(0.0, dtype=torch.float64, device=self.device)
+            "correct_total",
+            torch.tensor(0.0, dtype=largest_float(device), device=self.device),
         )
         self._add_state(
-            "target_total", torch.tensor(0.0, dtype=torch.float64, device=self.device)
+            "target_total",
+            torch.tensor(0.0, dtype=largest_float(device), device=self.device),
         )
         self._add_state(
-            "preds_total", torch.tensor(0.0, dtype=torch.float64, device=self.device)
+            "preds_total",
+            torch.tensor(0.0, dtype=largest_float(device), device=self.device),
         )
 
     @torch.inference_mode()
@@ -74,10 +79,12 @@ class WordInformationLost(Metric[torch.Tensor]):
             input: Transcription(s) to score as a string or list of strings
             target: Reference(s) for each speech input as a string or list of strings
         """
-        correct_total, target_total, preds_total = _wil_update(input, target)
-        self.correct_total += correct_total.to(self.device)
-        self.target_total += target_total.to(self.device)
-        self.preds_total += preds_total.to(self.device)
+        correct_total, target_total, preds_total = _wil_update(
+            input, target, self.device
+        )
+        self.correct_total += correct_total
+        self.target_total += target_total
+        self.preds_total += preds_total
         return self
 
     @torch.inference_mode()

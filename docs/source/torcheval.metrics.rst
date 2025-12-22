@@ -13,6 +13,7 @@ Aggregation Metrics
 
    AUC
    Cat
+   Covariance
    Max
    Mean
    Min
@@ -39,6 +40,7 @@ Classification Metrics
    BinaryAUPRC
    BinaryAUROC
    BinaryBinnedAUROC
+   BinaryBinnedAUPRC
    BinaryBinnedPrecisionRecallCurve
    BinaryConfusionMatrix
    BinaryF1Score
@@ -50,6 +52,7 @@ Classification Metrics
    MulticlassAccuracy
    MulticlassAUPRC
    MulticlassAUROC
+   MulticlassBinnedAUPRC
    MulticlassBinnedAUROC
    MulticlassBinnedPrecisionRecallCurve
    MulticlassConfusionMatrix
@@ -59,6 +62,8 @@ Classification Metrics
    MulticlassRecall
    MultilabelAccuracy
    MultilabelAUPRC
+   MultilabelBinnedAUPRC
+   MultilabelBinnedPrecisionRecallCurve
    MultilabelPrecisionRecallCurve
    MultilabelRecallAtFixedPrecision
    TopKMultilabelAccuracy
@@ -84,6 +89,8 @@ Ranking Metrics
    ClickThroughRate
    HitRate
    ReciprocalRank
+   RetrievalPrecision
+   RetrievalRecall
    WeightedCalibration
 
 Regression Metrics
@@ -95,6 +102,15 @@ Regression Metrics
 
    MeanSquaredError
    R2Score
+
+Statistical Metrics
+-------------------------------------------------------------------
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   Wasserstein1D
 
 Text Metrics
 -------------------------------------------------------------------
@@ -121,3 +137,4 @@ Windowed Metrics
    WindowedClickThroughRate
    WindowedMeanSquaredError
    WindowedWeightedCalibration
+

@@ -35,7 +35,7 @@ def binary_binned_auprc(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Binned Version of AUPRC, which is the area under the AUPRC Curve, for binary classification.
-    Its class version is ``torcheval.metrics.BinaryBinnedAUPRC``.
+    Its class version is :obj:`torcheval.metrics.BinaryBinnedAUPRC`.
 
     Computation is done by computing the area under the precision/recall curve; precision and recall
     are computed for the buckets defined by `threshold`.
@@ -179,7 +179,7 @@ def multiclass_binned_auprc(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Binned Version of AUPRC, which is the area under the AUPRC Curve, for multiclass classification.
-    Its class version is ``torcheval.metrics.MulticlassBinnedAUPRC``.
+    Its class version is :obj:`torcheval.metrics.MulticlassBinnedAUPRC`.
 
     Computation is done by computing the area under the precision/recall curve; precision and recall
     are computed for the buckets defined by `threshold`.
@@ -326,7 +326,7 @@ def multilabel_binned_auprc(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Binned Version of AUPRC, which is the area under the AUPRC Curve, for multilabel classification.
-    Its class version is ``torcheval.metrics.MultilabelBinnedAUPRC``.
+    Its class version is :obj:`torcheval.metrics.MultilabelBinnedAUPRC`.
 
     Computation is done by computing the area under the precision/recall curve; precision and recall
     are computed for the buckets defined by `threshold`.

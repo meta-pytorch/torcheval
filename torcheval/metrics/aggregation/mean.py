@@ -16,6 +16,7 @@ import torch
 
 from torcheval.metrics.functional.aggregation.mean import _mean_update
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TMean = TypeVar("TMean")
 
@@ -24,7 +25,7 @@ class Mean(Metric[torch.Tensor]):
     """
     Calculate the weighted mean value of all elements in all the input tensors.
     When weight is not provided, it calculates the unweighted mean.
-    Its functional version is ``torcheval.functional.mean()``.
+    Its functional version is :func:`torcheval.metrics.functional.mean`.
 
     Examples::
 
@@ -58,14 +59,13 @@ class Mean(Metric[torch.Tensor]):
         device: torch.device | None = None,
     ) -> None:
         super().__init__(device=device)
+        dtype = largest_float(device)
         # weighted sum of values over the entire state
         self._add_state(
-            "weighted_sum", torch.tensor(0.0, device=self.device, dtype=torch.float64)
+            "weighted_sum", torch.tensor(0.0, device=self.device, dtype=dtype)
         )
         # sum total of weights over the entire state
-        self._add_state(
-            "weights", torch.tensor(0.0, device=self.device, dtype=torch.float64)
-        )
+        self._add_state("weights", torch.tensor(0.0, device=self.device, dtype=dtype))
 
     @torch.inference_mode()
     # pyre-ignore[14]: inconsistent override on *_:Any, **__:Any
@@ -102,7 +102,7 @@ class Mean(Metric[torch.Tensor]):
             logging.warning(
                 "There is no weight for the average, no samples with weight have been added (did you ever run update()?)- returning 0.0"
             )
-            return torch.tensor(0.0, dtype=torch.float64)
+            return torch.tensor(0.0, dtype=largest_float(self.device))
         return self.weighted_sum / self.weights
 
     @torch.inference_mode()

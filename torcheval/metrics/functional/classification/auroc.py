@@ -21,6 +21,8 @@ try:
 except OSError:
     pass
 
+from torcheval.utils.device import largest_float
+
 
 @torch.inference_mode()
 def binary_auroc(
@@ -33,7 +35,7 @@ def binary_auroc(
 ) -> torch.Tensor:
     """
     Compute AUROC, which is the area under the ROC Curve, for binary classification.
-    Its class version is ``torcheval.metrics.BinaryAUROC``.
+    Its class version is :obj:`torcheval.metrics.BinaryAUROC`.
     See also :func:`multiclass_auroc <torcheval.metrics.functional.multiclass_auroc>`
 
     Args:
@@ -148,7 +150,7 @@ def _binary_auroc_compute_jit(
     auroc = torch.where(
         factor == 0,
         0.5,
-        torch.trapz(cum_tp, cum_fp).double() / factor,
+        torch.trapz(cum_tp, cum_fp).type(largest_float(target.device)) / factor,
     )
     return auroc
 
@@ -162,7 +164,7 @@ def _binary_auroc_compute(
     if use_fbgemm:
         assert input.is_cuda and target.is_cuda, "Tensors have to be on GPU"
         # auroc does not have weight
-        weight = torch.ones_like(input, dtype=torch.double)
+        weight = torch.ones_like(input, dtype=largest_float(input.device))
         num_tasks = 1 if len(input.shape) == 1 else input.shape[0]
         # FBGEMM AUC is an approximation of AUC. It does not mask data in case
         # that input values are redundant. For the highly redundant input case,

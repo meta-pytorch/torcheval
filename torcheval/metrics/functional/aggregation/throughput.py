@@ -17,7 +17,7 @@ def throughput(
 ) -> torch.Tensor:
     """
     Calculate the throughput value which is the number of elements processed per second.
-    Its class version is ``torcheval.metrics.Throughput``.
+    Its class version is :obj:`torcheval.metrics.Throughput`.
 
     Args:
         num_processed (int): Number of items processed.

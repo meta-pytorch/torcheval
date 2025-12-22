@@ -6,6 +6,7 @@
 
 # pyre-strict
 
+from typing import List, Optional, Tuple, Union
 
 import torch
 
@@ -13,13 +14,15 @@ from torcheval.metrics.functional.text.helper import _get_errors_and_totals
 
 
 def _wil_update(
-    input: str | list[str],
-    target: str | list[str],
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    input: Union[str, List[str]],
+    target: Union[str, List[str]],
+    device: torch.device,
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Update the wil score with the current set of references and predictions.
     Args:
         input: Transcription(s) to score as a string or list of strings
         target: Reference(s) for each speech input as a string or list of strings
+        device: The device to allocate tensors on
     Returns:
         Number of correct words
         Number of words overall references
@@ -29,10 +32,12 @@ def _wil_update(
         input = [input]
     if isinstance(target, str):
         target = [target]
-    assert (
-        len(input) == len(target)
+    assert len(input) == len(
+        target
     ), f"Arguments must contain the same number of strings, but got len(input)={len(input)} and len(target)={len(target)}"
-    errors, max_total, target_total, input_total = _get_errors_and_totals(input, target)
+    errors, max_total, target_total, input_total = _get_errors_and_totals(
+        input, target, device
+    )
     return errors - max_total, target_total, input_total
 
 
@@ -52,18 +57,20 @@ def _wil_compute(
 
 @torch.inference_mode()
 def word_information_lost(
-    input: str | list[str],
-    target: str | list[str],
+    input: Union[str, List[str]],
+    target: Union[str, List[str]],
+    device: Optional[torch.device] = None,
 ) -> torch.Tensor:
     """Word Information Lost rate is a metric of the performance of an automatic speech recognition system. This
     value indicates the percentage of characters that were incorrectly predicted. The lower the value, the better
     the performance of the ASR system with a Word Information Lost rate of 0 being a perfect score.
 
-    Its class version is ``torcheval.metrics.WordInformationLost``.
+    Its class version is :obj:`torcheval.metrics.text.WordInformationLost`.
 
     Args:
         input: Transcription(s) to score as a string or list of strings
         target: Reference(s) for each speech input as a string or list of strings
+        device: The device to allocate Tensors on
     Returns:
         Word Information Lost rate
     Examples:
@@ -73,5 +80,5 @@ def word_information_lost(
         >>> word_information_lost(input, target)
         tensor(0.6528)
     """
-    correct_total, target_total, preds_total = _wil_update(input, target)
+    correct_total, target_total, preds_total = _wil_update(input, target, device)
     return _wil_compute(correct_total, target_total, preds_total)

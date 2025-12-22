@@ -15,6 +15,7 @@ import torch
 
 from torcheval.metrics.functional.aggregation.sum import _sum_update
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TSum = TypeVar("TSum")
 
@@ -56,7 +57,8 @@ class Sum(Metric[torch.Tensor]):
     ) -> None:
         super().__init__(device=device)
         self._add_state(
-            "weighted_sum", torch.tensor(0.0, device=self.device, dtype=torch.float64)
+            "weighted_sum",
+            torch.tensor(0.0, device=self.device, dtype=largest_float(device)),
         )
 
     @torch.inference_mode()

@@ -25,6 +25,7 @@ Classification Metrics
    binary_accuracy
    binary_auprc
    binary_auroc
+   binary_binned_auprc
    binary_binned_auroc
    binary_binned_precision_recall_curve
    binary_confusion_matrix
@@ -37,6 +38,7 @@ Classification Metrics
    multiclass_accuracy
    multiclass_auprc
    multiclass_auroc
+   multiclass_binned_auprc
    multiclass_binned_auroc
    multiclass_binned_precision_recall_curve
    multiclass_confusion_matrix
@@ -46,6 +48,8 @@ Classification Metrics
    multiclass_recall
    multilabel_accuracy
    multilabel_auprc
+   multilabel_binned_auprc
+   multilabel_binned_precision_recall_curve
    multilabel_precision_recall_curve
    multilabel_recall_at_fixed_precision
    topk_multilabel_accuracy
@@ -72,6 +76,8 @@ Ranking Metrics
    num_collisions
    reciprocal_rank
    weighted_calibration
+   retrieval_precision
+   retrieval_recall
 
 Regression Metrics
 -------------------------------------------------------------------
@@ -82,6 +88,15 @@ Regression Metrics
 
    mean_squared_error
    r2_score
+
+Statistical Metrics
+-------------------------------------------------------------------
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   wasserstein_1d
 
 Text Metrics
 -------------------------------------------------------------------
@@ -95,3 +110,4 @@ Text Metrics
    word_error_rate
    word_information_preserved
    word_information_lost
+

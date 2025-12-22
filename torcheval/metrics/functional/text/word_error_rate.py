@@ -6,22 +6,28 @@
 
 # pyre-strict
 
+from typing import List, Optional, Tuple, Union
 
 import torch
+
+from torcheval.metrics.functional.text.helper import _edit_distance
+from torcheval.utils.device import largest_float
 
 
 @torch.inference_mode()
 def word_error_rate(
-    input: str | list[str],
-    target: str | list[str],
+    input: Union[str, List[str]],
+    target: Union[str, List[str]],
+    device: Optional[torch.device] = None,
 ) -> torch.Tensor:
     """
     Compute the word error rate of the predicted word sequence(s) with the reference word sequence(s).
-    Its class version is ``torcheval.metrics.WordErrorRate``.
+    Its class version is :obj:`torcheval.metrics.text.WordErrorRate`.
 
     Args:
         input (str, List[str]): Predicted word sequence(s) to score as a string or list of strings.
         target (str, List[str]): Reference word sequence(s) as a string or list of strings.
+        device: The device to allocate tensors on
 
     Examples:
 
@@ -36,28 +42,31 @@ def word_error_rate(
         >>> word_error_rate(input, target)
         tensor(0.5)
     """
-    errors, total = _word_error_rate_update(input, target)
+    errors, total = _word_error_rate_update(input, target, device)
     return _word_error_rate_compute(errors, total)
 
 
 def _word_error_rate_update(
-    input: str | list[str],
-    target: str | list[str],
-) -> tuple[torch.Tensor, torch.Tensor]:
+    input: Union[str, List[str]],
+    target: Union[str, List[str]],
+    device: torch.device,
+) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Update the metric state with edit distance and the length of the reference sequence.
 
     Args:
         input (str, List[str]): Predicted word sequence(s) to score as a string or list of strings.
         target (str, List[str]): Reference word sequence(s) as a string or list of strings.
+        device: The device to allocate Tensors on
     """
     _word_error_rate_input_check(input, target)
     if isinstance(input, str):
         input = [input]
     if isinstance(target, str):
         target = [target]
-    errors = torch.tensor(0, dtype=torch.float64)
-    total = torch.tensor(0, dtype=torch.float64)
+    dtype = largest_float(device)
+    errors = torch.tensor(0, dtype=dtype, device=device)
+    total = torch.tensor(0, dtype=dtype, device=device)
     for ipt, tgt in zip(input, target):
         ipt_tokens = ipt.split()
         tgt_tokens = tgt.split()
@@ -80,34 +89,9 @@ def _word_error_rate_compute(
     return errors / total
 
 
-def _edit_distance(
-    prediction_tokens: list[str],
-    reference_tokens: list[str],
-) -> int:
-    """
-    Dynamic programming algorithm to compute the edit distance between two word sequences.
-
-    Args:
-        prediction_tokens (List[str]): A tokenized predicted sentence
-        reference_tokens (List[str]): A tokenized reference sentence
-    """
-    dp = [[0] * (len(reference_tokens) + 1) for _ in range(len(prediction_tokens) + 1)]
-    for i in range(len(prediction_tokens) + 1):
-        dp[i][0] = i
-    for j in range(len(reference_tokens) + 1):
-        dp[0][j] = j
-    for i in range(1, len(prediction_tokens) + 1):
-        for j in range(1, len(reference_tokens) + 1):
-            if prediction_tokens[i - 1] == reference_tokens[j - 1]:
-                dp[i][j] = dp[i - 1][j - 1]
-            else:
-                dp[i][j] = min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1
-    return dp[-1][-1]
-
-
 def _word_error_rate_input_check(
-    input: str | list[str],
-    target: str | list[str],
+    input: Union[str, List[str]],
+    target: Union[str, List[str]],
 ) -> None:
     if (isinstance(input, str) and not isinstance(target, str)) or (
         isinstance(input, list) and not isinstance(target, list)

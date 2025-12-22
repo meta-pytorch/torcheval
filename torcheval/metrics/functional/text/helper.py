@@ -7,12 +7,16 @@
 # pyre-strict
 
 
+from typing import List, Tuple, Union
+
 import torch
+
+from torcheval.utils.device import largest_float
 
 
 def _edit_distance(
-    prediction_tokens: list[str],
-    reference_tokens: list[str],
+    prediction_tokens: List[str],
+    reference_tokens: List[str],
 ) -> int:
     """
     Dynamic programming algorithm to compute the edit distance between two word sequences.
@@ -36,24 +40,27 @@ def _edit_distance(
 
 
 def _get_errors_and_totals(
-    input: str | list[str],
-    target: str | list[str],
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    input: Union[str, List[str]],
+    target: Union[str, List[str]],
+    device: torch.device,
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Calculate the edit distance, max length and lengths of predicted and reference word sequences.
 
         Args:
             input (str, List[str]): Predicted word sequence(s) to score as a string or list of strings.
             target (str, List[str]): Reference word sequence(s) as a string or list of strings.
+            device: The device to allocate tensors on
     """
     if isinstance(input, str):
         input = [input]
     if isinstance(target, str):
         target = [target]
-    max_total = torch.tensor(0.0, dtype=torch.float64)
-    errors = torch.tensor(0.0, dtype=torch.float64)
-    target_total = torch.tensor(0.0, dtype=torch.float64)
-    input_total = torch.tensor(0.0, dtype=torch.float64)
+    dtype = largest_float(device)
+    max_total = torch.tensor(0.0, dtype=dtype, device=device)
+    errors = torch.tensor(0.0, dtype=dtype, device=device)
+    target_total = torch.tensor(0.0, dtype=dtype, device=device)
+    input_total = torch.tensor(0.0, dtype=dtype, device=device)
     for ipt, tgt in zip(input, target):
         input_tokens = ipt.split()
         target_tokens = tgt.split()

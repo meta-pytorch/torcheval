@@ -41,14 +41,16 @@ class StructuralSimilarity(Metric[torch.Tensor]):
     Compute the structural similarity index (SSIM) between two sets of images.
 
     Args:
-    device (torch.device): The device where the computations will be performed.
-        If None, the default device will be used.
+        device (torch.device): The device where the computations will be performed.
+            If None, the default device will be used.
     """
 
     def __init__(
         self: TStructuralSimilarity,
         device: torch.device | None = None,
     ) -> None:
+        _validate_torchvision_available()
+
         super().__init__(device=device)
 
         self._add_state("mssim_sum", torch.tensor(0, device=device, dtype=torch.float))

@@ -18,7 +18,7 @@ def peak_signal_noise_ratio(
 ) -> torch.Tensor:
     """
     Compute the peak signal-to-noise ratio between two images.
-    It's class version is `torcheval.metrics.PeakSignalNoiseRatio`
+    It's class version is :obj:`torcheval.metrics.PeakSignalNoiseRatio`.
 
     Args:
         input (Tensor): Input image ``(N, C, H, W)``.

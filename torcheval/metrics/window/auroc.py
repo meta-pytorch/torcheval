@@ -18,6 +18,7 @@ from torcheval.metrics.functional.classification.auroc import (
     _binary_auroc_update_input_check,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 
 TAUROC = TypeVar("TAUROC")
@@ -50,7 +51,10 @@ class WindowedBinaryAUROC(Metric[torch.Tensor]):
         >>> metric.update(torch.tensor([[0.5, 0.1], [0.3, 0.9]]), torch.tensor([[0.0, 1.0], [0.0, 0.0]]))
         >>> metric.inputs
         tensor([[0.1000, 0.3000, 0.8000, 0.3000, 0.5000],
-        [0.9000, 0.1000, 0.6000, 0.1000, 0.3000]])
+                [0.9000, 0.1000, 0.6000, 0.1000, 0.3000]])
+        >>> metric.targets
+        tensor([[1., 0., 1., 1., 0.],
+                [0., 1., 1., 0., 0.]])
         >>> metric.compute()
         tensor([0.4167, 0.5000])
 
@@ -108,7 +112,7 @@ class WindowedBinaryAUROC(Metric[torch.Tensor]):
                 or (num_tasks, num_samples).
         """
         if weight is None:
-            weight = torch.ones_like(input, dtype=torch.double)
+            weight = torch.ones_like(input, dtype=largest_float(input.device))
         _binary_auroc_update_input_check(input, target, self.num_tasks, weight)
         if input.ndim == 1:
             input = input.reshape(1, -1)

@@ -18,6 +18,7 @@ from torcheval.metrics.functional.text.perplexity import (
     _perplexity_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TPerplexity = TypeVar("TPerplexity")
 
@@ -28,7 +29,7 @@ class Perplexity(Metric[torch.Tensor]):
 
     ppl = exp (sum of negative log likelihood / number of tokens)
 
-    Its functional version is ``torcheval.metrics.functional.text.perplexity``.
+    Its functional version is :func:`torcheval.metrics.functional.perplexity`.
 
     Args:
         ignore_index (Tensor):
@@ -80,12 +81,11 @@ class Perplexity(Metric[torch.Tensor]):
         super().__init__(device=device)
 
         self.ignore_index = ignore_index
+        dtype = largest_float(device)
         self._add_state(
-            "sum_log_probs", torch.tensor(0.0, dtype=torch.float64, device=self.device)
+            "sum_log_probs", torch.tensor(0.0, dtype=dtype, device=self.device)
         )
-        self._add_state(
-            "num_total", torch.tensor(0.0, dtype=torch.float64, device=self.device)
-        )
+        self._add_state("num_total", torch.tensor(0.0, dtype=dtype, device=self.device))
 
     @torch.inference_mode()
     # pyre-ignore[14]: `update` overrides method defined in `Metric` inconsistently.
@@ -118,7 +118,7 @@ class Perplexity(Metric[torch.Tensor]):
         If no `update()` calls are made before `compute()`  is called, return an empty tensor.
         """
         if self.num_total == 0.0:
-            return torch.empty(0)
+            return torch.empty(0, device=self.device)
         return _perplexity_compute(self.sum_log_probs, self.num_total)
 
     @torch.inference_mode()

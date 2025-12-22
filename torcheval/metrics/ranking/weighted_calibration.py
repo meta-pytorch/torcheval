@@ -17,6 +17,7 @@ from torcheval.metrics.functional.ranking.weighted_calibration import (
     _weighted_calibration_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TWeightedCalibration = TypeVar("TWeightedCalibration")
 
@@ -68,13 +69,14 @@ class WeightedCalibration(Metric[torch.Tensor]):
                 "`num_tasks` value should be greater than and equal to 1, but received {num_tasks}. "
             )
         self.num_tasks = num_tasks
+        dtype = largest_float(device)
         self._add_state(
             "weighted_input_sum",
-            torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+            torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
         )
         self._add_state(
             "weighted_target_sum",
-            torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+            torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
         )
 
     @torch.inference_mode()
@@ -112,7 +114,7 @@ class WeightedCalibration(Metric[torch.Tensor]):
             Tensor: The return value of weighted calibration for each task (num_tasks,).
         """
         if torch.any(self.weighted_target_sum == 0.0):
-            return torch.empty(0)
+            return torch.empty(0, device=self.device)
 
         weighted_calibration = self.weighted_input_sum / self.weighted_target_sum
         return weighted_calibration

@@ -18,6 +18,7 @@ from torcheval.metrics.functional.text.bleu import (
 )
 
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TBLEUScore = TypeVar("TBLEUScore")
 
@@ -25,7 +26,7 @@ TBLEUScore = TypeVar("TBLEUScore")
 class BLEUScore(Metric[torch.Tensor]):
     """
     Compute BLEU score (https://en.wikipedia.org/wiki/BLEU) given translations and references.
-    Its functional version is ``torcheval.metrics.functional.text.bleu``.
+    Its functional version is :func:`torcheval.metrics.functional.bleu_score`.
 
     Args:
         n_gram: Maximum n-gram to use when computing BLEU score. Can be 1, 2, 3, or 4.
@@ -65,19 +66,16 @@ class BLEUScore(Metric[torch.Tensor]):
 
         self.weights = weights
         self.n_gram = n_gram
-        self._add_state(
-            "input_len", torch.tensor(0.0, dtype=torch.float64, device=device)
-        )
-        self._add_state(
-            "target_len", torch.tensor(0.0, dtype=torch.float64, device=device)
-        )
+        dtype = largest_float(device)
+        self._add_state("input_len", torch.tensor(0.0, dtype=dtype, device=device))
+        self._add_state("target_len", torch.tensor(0.0, dtype=dtype, device=device))
         self._add_state(
             "matches_by_order",
-            torch.zeros(n_gram, dtype=torch.float64, device=device),
+            torch.zeros(n_gram, dtype=dtype, device=device),
         )
         self._add_state(
             "possible_matches_by_order",
-            torch.zeros(n_gram, dtype=torch.float64, device=device),
+            torch.zeros(n_gram, dtype=dtype, device=device),
         )
 
     @torch.inference_mode()
@@ -113,7 +111,9 @@ class BLEUScore(Metric[torch.Tensor]):
         ``compute()`` is called, return tensor(0.0).
         """
         if torch.sum(self.matches_by_order) == 0:
-            return torch.tensor(0.0, dtype=torch.float64, device=self.device)
+            return torch.tensor(
+                0.0, dtype=largest_float(self.device), device=self.device
+            )
         return _bleu_score_compute(
             self.input_len,
             self.target_len,

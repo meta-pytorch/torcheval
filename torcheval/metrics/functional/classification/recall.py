@@ -21,7 +21,7 @@ def binary_recall(
     """
     Compute recall score for binary classification class, which is calculated as the ratio between the number of
     true positives (TP) and the total number of actual positives (TP + FN).
-    Its class version is ``torcheval.metrics.BinaryRecall``.
+    Its class version is :obj:`torcheval.metrics.BinaryRecall`.
     See also :func:`multiclass_recall <torcheval.metrics.functional.multiclass_recall>`
 
     Args:
@@ -104,7 +104,7 @@ def multiclass_recall(
     """
     Compute recall score, which is calculated as the ratio between the number of
     true positives (TP) and the total number of actual positives (TP + FN).
-    Its class version is ``torcheval.metrics.MultiClassRecall``.
+    Its class version is :obj:`torcheval.metrics.MulticlassRecall`.
     See also :func:`binary_recall <torcheval.metrics.functional.binary_recall>`
 
     Args:
@@ -173,10 +173,14 @@ def _recall_update(
     assert isinstance(
         num_classes, int
     ), f"`num_classes` must be an integer, but received {num_classes}."
-    num_labels = target.new_zeros(num_classes).scatter_(0, target, 1, reduce="add")
-    num_predictions = target.new_zeros(num_classes).scatter_(0, input, 1, reduce="add")
-    num_tp = target.new_zeros(num_classes).scatter_(
-        0, target[input == target], 1, reduce="add"
+    num_labels = target.new_zeros(num_classes).scatter_add_(
+        0, target, torch.ones_like(target)
+    )
+    num_predictions = target.new_zeros(num_classes).scatter_add_(
+        0, input, torch.ones_like(input)
+    )
+    num_tp = target.new_zeros(num_classes).scatter_add_(
+        0, target[input == target], torch.ones_like(target)
     )
     return num_tp, num_labels, num_predictions
 

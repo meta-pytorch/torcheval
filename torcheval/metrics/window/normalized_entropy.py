@@ -18,6 +18,7 @@ from torcheval.metrics.functional.classification.binary_normalized_entropy impor
     _binary_normalized_entropy_update,
 )
 from torcheval.metrics.metric import Metric
+from torcheval.utils.device import largest_float
 
 TWindowedNormalizedEntropy = TypeVar("TWindowedNormalizedEntropy")
 
@@ -104,18 +105,19 @@ class WindowedBinaryNormalizedEntropy(
         self.enable_lifetime = enable_lifetime
         self._add_state("total_updates", 0)
 
+        dtype = largest_float(device)
         if self.enable_lifetime:
             self._add_state(
                 "total_entropy",
-                torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+                torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
             )
             self._add_state(
                 "num_examples",
-                torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+                torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
             )
             self._add_state(
                 "num_positive",
-                torch.zeros(self.num_tasks, dtype=torch.float64, device=self.device),
+                torch.zeros(self.num_tasks, dtype=dtype, device=self.device),
             )
 
         self._add_state(
@@ -123,7 +125,7 @@ class WindowedBinaryNormalizedEntropy(
             torch.zeros(
                 self.num_tasks,
                 self.max_num_updates,
-                dtype=torch.float64,
+                dtype=dtype,
                 device=self.device,
             ),
         )
@@ -132,7 +134,7 @@ class WindowedBinaryNormalizedEntropy(
             torch.zeros(
                 self.num_tasks,
                 self.max_num_updates,
-                dtype=torch.float64,
+                dtype=dtype,
                 device=self.device,
             ),
         )
@@ -141,7 +143,7 @@ class WindowedBinaryNormalizedEntropy(
             torch.zeros(
                 self.num_tasks,
                 self.max_num_updates,
-                dtype=torch.float64,
+                dtype=dtype,
                 device=self.device,
             ),
         )
@@ -196,10 +198,11 @@ class WindowedBinaryNormalizedEntropy(
             The return tensors is binary normalized entropy for each task (num_tasks,).
         """
         if self.total_updates == 0:
+            naught = torch.empty(0, device=self.device)
             if self.enable_lifetime:
-                return torch.empty(0), torch.empty(0)
+                return naught, naught
             else:
-                return torch.empty(0)
+                return naught
 
         # For the case that window has been filled more than once
         if self.total_updates >= self.max_num_updates:
@@ -251,22 +254,23 @@ class WindowedBinaryNormalizedEntropy(
         cur_total_entropy = self.windowed_total_entropy
         cur_num_examples = self.windowed_num_examples
         cur_num_positive = self.windowed_num_positive
+        dtype = largest_float(self.device)
         self.windowed_total_entropy = torch.zeros(
             self.num_tasks,
             merge_max_num_updates,
-            dtype=torch.float64,
+            dtype=dtype,
             device=self.device,
         )
         self.windowed_num_examples = torch.zeros(
             self.num_tasks,
             merge_max_num_updates,
-            dtype=torch.float64,
+            dtype=dtype,
             device=self.device,
         )
         self.windowed_num_positive = torch.zeros(
             self.num_tasks,
             merge_max_num_updates,
-            dtype=torch.float64,
+            dtype=dtype,
             device=self.device,
         )
 
