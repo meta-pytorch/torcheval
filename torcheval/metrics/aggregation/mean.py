@@ -13,7 +13,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.aggregation.mean import _mean_update
 from torcheval.metrics.metric import Metric
 

@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.classification.binary_normalized_entropy import (
     _baseline_update,
     _binary_normalized_entropy_update,

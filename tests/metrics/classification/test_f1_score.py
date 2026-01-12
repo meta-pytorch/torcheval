@@ -8,10 +8,8 @@
 
 
 import numpy as np
-
 import torch
 from sklearn.metrics import f1_score
-
 from torcheval.metrics import BinaryF1Score, MulticlassF1Score
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

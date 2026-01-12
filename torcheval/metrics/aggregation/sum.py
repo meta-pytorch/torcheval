@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.aggregation.sum import _sum_update
 from torcheval.metrics.metric import Metric
 

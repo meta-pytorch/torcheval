@@ -77,12 +77,12 @@ def _binary_precision_recall_curve_update_input_check(
 ) -> None:
     if input.ndim != 1:
         raise ValueError(
-            "input should be a one-dimensional tensor, " f"got shape {input.shape}."
+            f"input should be a one-dimensional tensor, got shape {input.shape}."
         )
 
     if target.ndim != 1:
         raise ValueError(
-            "target should be a one-dimensional tensor, " f"got shape {target.shape}."
+            f"target should be a one-dimensional tensor, got shape {target.shape}."
         )
 
     if input.shape != target.shape:
@@ -196,7 +196,7 @@ def _multiclass_precision_recall_curve_update_input_check(
 
     if target.ndim != 1:
         raise ValueError(
-            "target should be a one-dimensional tensor, " f"got shape {target.shape}."
+            f"target should be a one-dimensional tensor, got shape {target.shape}."
         )
 
     if not (input.ndim == 2 and (num_classes is None or input.shape[1] == num_classes)):

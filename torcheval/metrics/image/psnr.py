@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.image.psnr import (
     _psnr_compute,
     _psnr_param_check,

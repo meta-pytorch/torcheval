@@ -9,7 +9,6 @@
 import unittest
 
 import numpy as np
-
 import torch
 from sklearn.metrics import precision_score
 from torcheval.metrics.functional import (

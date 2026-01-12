@@ -9,7 +9,6 @@
 import unittest
 
 import numpy as np
-
 import torch
 from sklearn.metrics import recall_score as ref_recall_score
 from torcheval.metrics.functional import multiclass_recall as my_recall_score

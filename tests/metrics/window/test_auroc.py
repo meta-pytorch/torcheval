@@ -9,7 +9,6 @@
 
 import torch
 from sklearn.metrics import roc_auc_score
-
 from torcheval.metrics import WindowedBinaryAUROC
 from torcheval.metrics.functional import binary_auroc
 from torcheval.utils.test_utils.metric_class_tester import (

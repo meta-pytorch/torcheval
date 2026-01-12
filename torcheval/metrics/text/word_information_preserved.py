@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.text.word_information_preserved import (
     _word_information_preserved_compute,
     _word_information_preserved_update,

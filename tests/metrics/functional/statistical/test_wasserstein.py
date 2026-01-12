@@ -7,9 +7,7 @@
 import unittest
 
 import numpy as np
-
 import torch
-
 from scipy.stats import wasserstein_distance as sp_wasserstein
 from torcheval.metrics.functional.statistical.wasserstein import wasserstein_1d
 from torcheval.utils import random_data as rd

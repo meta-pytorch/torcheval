@@ -6,7 +6,6 @@
 
 
 import torch
-
 from scipy.stats import wasserstein_distance as sp_wasserstein
 from torcheval.metrics.statistical.wasserstein import Wasserstein1D
 from torcheval.utils.random_data import get_rand_data_wasserstein1d

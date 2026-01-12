@@ -10,7 +10,6 @@ import random
 import unittest
 
 import numpy as np
-
 import torch
 from sklearn.metrics import average_precision_score as sk_ap
 from torcheval.metrics.functional import binary_auprc, multiclass_auprc

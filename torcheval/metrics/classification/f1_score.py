@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.classification.f1_score import (
     _binary_f1_score_update,
     _f1_score_compute,
@@ -100,9 +99,9 @@ class MulticlassF1Score(Metric[torch.Tensor]):
             )
         else:
             # num_classes has been verified as a positive integer. Add this line to bypass pyre.
-            assert isinstance(
-                num_classes, int
-            ), f"num_classes must be a integer, but got {num_classes}"
+            assert isinstance(num_classes, int), (
+                f"num_classes must be a integer, but got {num_classes}"
+            )
 
             self._add_state(
                 "num_tp",

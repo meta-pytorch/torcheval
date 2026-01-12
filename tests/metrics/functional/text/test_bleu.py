@@ -8,12 +8,10 @@
 # pyre-strict
 
 import unittest
-
 from collections import Counter
 from math import exp
 
 import torch
-
 from torcheval.metrics.functional.text.bleu import (
     _bleu_score_update,
     _calc_brevity_penalty,

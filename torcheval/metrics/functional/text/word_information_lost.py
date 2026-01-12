@@ -8,7 +8,6 @@
 
 
 import torch
-
 from torcheval.metrics.functional.text.helper import _get_errors_and_totals
 
 
@@ -29,9 +28,9 @@ def _wil_update(
         input = [input]
     if isinstance(target, str):
         target = [target]
-    assert (
-        len(input) == len(target)
-    ), f"Arguments must contain the same number of strings, but got len(input)={len(input)} and len(target)={len(target)}"
+    assert len(input) == len(target), (
+        f"Arguments must contain the same number of strings, but got len(input)={len(input)} and len(target)={len(target)}"
+    )
     errors, max_total, target_total, input_total = _get_errors_and_totals(input, target)
     return errors - max_total, target_total, input_total
 

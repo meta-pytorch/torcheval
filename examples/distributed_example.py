@@ -25,7 +25,6 @@ from torch import distributed as dist
 from torch.distributed import launcher as pet
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data.dataset import TensorDataset
-
 from torcheval.metrics import MulticlassAccuracy, Throughput
 from torcheval.metrics.toolkit import sync_and_compute
 

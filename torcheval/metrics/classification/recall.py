@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.classification.recall import (
     _binary_recall_compute,
     _binary_recall_update,
@@ -196,9 +195,9 @@ class MulticlassRecall(Metric[torch.Tensor]):
                 torch.tensor(0.0, device=self.device),
             )
         else:
-            assert isinstance(
-                num_classes, int
-            ), f"`num_classes` must be an integer, but got {num_classes}."
+            assert isinstance(num_classes, int), (
+                f"`num_classes` must be an integer, but got {num_classes}."
+            )
             self._add_state(
                 "num_tp",
                 torch.zeros(num_classes, device=self.device),

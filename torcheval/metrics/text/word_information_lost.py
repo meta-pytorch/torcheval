@@ -12,12 +12,10 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.text.word_information_lost import (
     _wil_compute,
     _wil_update,
 )
-
 from torcheval.metrics.metric import Metric
 
 TWordInformationLost = TypeVar("TWordInformationLost")

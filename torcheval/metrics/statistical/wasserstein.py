@@ -8,7 +8,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.statistical.wasserstein import (
     _wasserstein_compute,
     _wasserstein_update_input_check,

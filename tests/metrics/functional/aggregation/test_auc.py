@@ -11,7 +11,6 @@
 import unittest
 
 import torch
-
 from sklearn.metrics import auc as sklearn_auc
 from torcheval.metrics.functional.aggregation import auc
 

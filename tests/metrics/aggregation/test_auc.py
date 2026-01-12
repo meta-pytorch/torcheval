@@ -9,9 +9,7 @@
 # pyre-ignore-all-errors[56]: Pyre was not able to infer the type of argument
 
 import torch
-
 from sklearn.metrics import auc as sklearn_auc
-
 from torcheval.metrics.aggregation.auc import AUC
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

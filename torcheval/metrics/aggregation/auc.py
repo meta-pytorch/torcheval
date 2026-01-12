@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.aggregation.auc import (
     _auc_compute,
     _auc_update_input_check,

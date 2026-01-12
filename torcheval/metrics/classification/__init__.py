@@ -17,7 +17,6 @@ from torcheval.metrics.classification.auprc import (
     MulticlassAUPRC,
     MultilabelAUPRC,
 )
-
 from torcheval.metrics.classification.auroc import BinaryAUROC, MulticlassAUROC
 from torcheval.metrics.classification.binary_normalized_entropy import (
     BinaryNormalizedEntropy,

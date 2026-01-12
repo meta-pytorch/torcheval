@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.text.perplexity import (
     _perplexity_compute,
     _perplexity_update,

@@ -10,7 +10,6 @@
 import unittest
 
 import torch
-
 from torcheval.utils import (
     get_rand_data_binary,
     get_rand_data_binned_binary,

@@ -14,7 +14,6 @@ from typing import Any, overload, TypeVar
 import torch
 import torch.distributed as dist
 from pyre_extensions import none_throws
-
 from torcheval.metrics import Metric
 from torcheval.metrics.metric import TComputeReturn, TState
 from torcheval.metrics.synclib import metrics_traversal_order, sync_states
@@ -342,8 +341,7 @@ def _validate_rank_and_world_size(
 ) -> None:
     if world_size == 1:
         log.warning(
-            "World size is 1, and metric(s) not synced. "
-            "returning the input metric(s)."
+            "World size is 1, and metric(s) not synced. returning the input metric(s)."
         )
     elif world_size == -1:
         raise RuntimeError("The current process is not part of the process group")

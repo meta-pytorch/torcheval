@@ -13,7 +13,6 @@ import torch
 import torch.distributed as dist
 import torch.distributed.launcher as pet
 from pyre_extensions import none_throws
-
 from torcheval.metrics.synclib import (
     _sync_dtype_and_shape,
     _sync_list_length,

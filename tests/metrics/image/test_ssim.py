@@ -9,7 +9,6 @@
 
 import torch
 from torch import Tensor
-
 from torcheval.metrics.image.ssim import StructuralSimilarity
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

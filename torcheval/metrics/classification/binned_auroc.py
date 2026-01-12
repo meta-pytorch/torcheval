@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.classification.binned_auroc import (
     _binary_binned_auroc_compute,
     _binary_binned_auroc_param_check,

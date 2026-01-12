@@ -12,7 +12,6 @@ import uuid
 from collections.abc import Callable
 
 import pytest
-
 import torch
 import torch.distributed.launcher as pet
 from torcheval.metrics import Metric

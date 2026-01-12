@@ -7,11 +7,8 @@
 # pyre-strict
 
 from torcheval.metrics.functional.aggregation.auc import auc
-
 from torcheval.metrics.functional.aggregation.mean import mean
-
 from torcheval.metrics.functional.aggregation.sum import sum
-
 from torcheval.metrics.functional.aggregation.throughput import throughput
 
 

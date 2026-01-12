@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar, Union
 
 import torch
-
 from torcheval.metrics.functional.ranking.weighted_calibration import (
     _weighted_calibration_update,
 )

@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.classification.binned_precision_recall_curve import (
     _binary_binned_precision_recall_curve_compute,
     _binary_binned_precision_recall_curve_update,

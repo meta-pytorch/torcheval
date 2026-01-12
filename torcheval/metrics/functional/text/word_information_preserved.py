@@ -8,7 +8,6 @@
 
 
 import torch
-
 from torcheval.metrics.functional.text.helper import _get_errors_and_totals
 
 

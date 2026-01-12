@@ -16,7 +16,6 @@ from torcheval.metrics.functional.text.bleu import (
     _bleu_score_compute,
     _bleu_score_update,
 )
-
 from torcheval.metrics.metric import Metric
 
 TBLEUScore = TypeVar("TBLEUScore")

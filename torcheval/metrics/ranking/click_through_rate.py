@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.ranking.click_through_rate import (
     _click_through_rate_compute,
     _click_through_rate_update,

@@ -10,11 +10,8 @@
 
 
 import numpy as np
-
 import torch
-
 from sklearn.metrics import average_precision_score as sk_ap
-
 from torcheval.metrics import BinaryAUPRC, MulticlassAUPRC
 from torcheval.metrics.classification.auprc import MultilabelAUPRC
 from torcheval.utils.random_data import get_rand_data_binary, get_rand_data_multiclass

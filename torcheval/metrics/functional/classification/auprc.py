@@ -318,7 +318,7 @@ def _multiclass_auprc_update_input_check(
 
     if target.ndim != 1:
         raise ValueError(
-            "target should be a one-dimensional tensor, " f"got shape {target.shape}."
+            f"target should be a one-dimensional tensor, got shape {target.shape}."
         )
 
     if not (input.ndim == 2 and input.shape[1] == num_classes):

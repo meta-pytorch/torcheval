@@ -8,10 +8,8 @@
 
 
 import numpy as np
-
 import torch
 from sklearn.metrics import recall_score
-
 from torcheval.metrics.classification import BinaryRecall, MulticlassRecall
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

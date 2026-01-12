@@ -10,7 +10,6 @@
 
 import torch
 from torch.utils.data.dataset import TensorDataset
-
 from torcheval.metrics import MulticlassAccuracy
 
 NUM_EPOCHS = 4

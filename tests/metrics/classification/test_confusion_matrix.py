@@ -9,7 +9,6 @@
 
 import torch
 from sklearn.metrics import confusion_matrix as skcm
-
 from torcheval.metrics import BinaryConfusionMatrix, MulticlassConfusionMatrix
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

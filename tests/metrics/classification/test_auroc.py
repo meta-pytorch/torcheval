@@ -11,9 +11,7 @@
 import unittest
 
 import torch
-
 from sklearn.metrics import roc_auc_score
-
 from torcheval.metrics import BinaryAUROC, MulticlassAUROC
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

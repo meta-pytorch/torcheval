@@ -8,10 +8,8 @@
 
 
 import numpy as np
-
 import torch
 from sklearn.metrics import precision_score
-
 from torcheval.metrics import BinaryPrecision, MulticlassPrecision
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

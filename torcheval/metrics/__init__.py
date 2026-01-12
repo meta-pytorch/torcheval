@@ -51,14 +51,12 @@ from torcheval.metrics.classification import (
     MultilabelRecallAtFixedPrecision,
     TopKMultilabelAccuracy,
 )
-
 from torcheval.metrics.image import (
     FrechetInceptionDistance,
     PeakSignalNoiseRatio,
     StructuralSimilarity,
 )
 from torcheval.metrics.metric import Metric
-
 from torcheval.metrics.ranking import (
     ClickThroughRate,
     HitRate,
@@ -68,7 +66,6 @@ from torcheval.metrics.ranking import (
     WeightedCalibration,
 )
 from torcheval.metrics.regression import MeanSquaredError, R2Score
-
 from torcheval.metrics.text import (
     BLEUScore,
     Perplexity,

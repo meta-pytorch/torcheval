@@ -9,7 +9,6 @@
 import unittest
 
 import torch
-
 from skimage.metrics import peak_signal_noise_ratio as skimage_psnr
 from torcheval.metrics.functional import peak_signal_noise_ratio
 from torcheval.utils.test_utils.metric_class_tester import (

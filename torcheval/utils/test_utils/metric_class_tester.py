@@ -18,7 +18,6 @@ from typing import Any, Literal
 
 import torch
 import torch.distributed.launcher as pet
-
 from torcheval.metrics import Metric
 from torcheval.metrics.toolkit import clone_metric, sync_and_compute
 from torchtnt.utils import copy_data_to_device, init_from_env

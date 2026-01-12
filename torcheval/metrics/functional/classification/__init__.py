@@ -17,12 +17,10 @@ from torcheval.metrics.functional.classification.auprc import (
     multiclass_auprc,
     multilabel_auprc,
 )
-
 from torcheval.metrics.functional.classification.auroc import (
     binary_auroc,
     multiclass_auroc,
 )
-
 from torcheval.metrics.functional.classification.binary_normalized_entropy import (
     binary_normalized_entropy,
 )

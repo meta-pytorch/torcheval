@@ -8,7 +8,6 @@
 
 
 import torch
-
 from torcheval.metrics import (
     BinaryBinnedPrecisionRecallCurve,
     MulticlassBinnedPrecisionRecallCurve,

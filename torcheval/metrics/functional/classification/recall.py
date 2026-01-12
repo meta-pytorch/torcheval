@@ -170,9 +170,9 @@ def _recall_update(
         num_predictions = num_labels
         return num_tp, num_labels, num_predictions
 
-    assert isinstance(
-        num_classes, int
-    ), f"`num_classes` must be an integer, but received {num_classes}."
+    assert isinstance(num_classes, int), (
+        f"`num_classes` must be an integer, but received {num_classes}."
+    )
     num_labels = target.new_zeros(num_classes).scatter_(0, target, 1, reduce="add")
     num_predictions = target.new_zeros(num_classes).scatter_(0, input, 1, reduce="add")
     num_tp = target.new_zeros(num_classes).scatter_(

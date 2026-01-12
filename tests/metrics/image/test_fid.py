@@ -8,11 +8,9 @@
 
 
 import numpy as np
-
 import torch
 from torch import nn, Tensor
 from torch.nn import functional as F
-
 from torcheval.metrics.image.fid import FrechetInceptionDistance
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

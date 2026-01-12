@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.text.word_error_rate import (
     _word_error_rate_compute,
     _word_error_rate_update,

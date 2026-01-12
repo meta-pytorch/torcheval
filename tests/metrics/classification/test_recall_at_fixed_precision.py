@@ -7,12 +7,10 @@
 # pyre-strict
 
 import torch
-
 from torcheval.metrics import (
     BinaryRecallAtFixedPrecision,
     MultilabelRecallAtFixedPrecision,
 )
-
 from torcheval.metrics.functional.classification.recall_at_fixed_precision import (
     binary_recall_at_fixed_precision,
 )

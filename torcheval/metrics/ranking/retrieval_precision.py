@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import Literal, TypeVar
 
 import torch
-
 from torcheval.metrics.functional.ranking.retrieval_precision import (
     _retrieval_precision_param_check,
     _retrieval_precision_update_input_check,

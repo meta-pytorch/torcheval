@@ -256,7 +256,7 @@ def _confusion_matrix_update_input_check(
 
     if target.ndim != 1:
         raise ValueError(
-            "target should be a one-dimensional tensor, " f"got shape {target.shape}."
+            f"target should be a one-dimensional tensor, got shape {target.shape}."
         )
 
     # check if num classes is high enough to cover inputs.

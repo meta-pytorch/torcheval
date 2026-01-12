@@ -8,7 +8,6 @@
 
 
 import torch
-
 from skimage.metrics import peak_signal_noise_ratio as skimage_peak_signal_noise_ratio
 from torcheval.metrics import PeakSignalNoiseRatio
 from torcheval.utils.test_utils.metric_class_tester import (

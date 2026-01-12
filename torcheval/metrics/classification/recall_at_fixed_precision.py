@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.classification.recall_at_fixed_precision import (
     _binary_recall_at_fixed_precision_compute,
     _binary_recall_at_fixed_precision_update_input_check,

@@ -13,7 +13,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics import Metric
 
 TDummySumMetric = TypeVar("TDummySumMetric")

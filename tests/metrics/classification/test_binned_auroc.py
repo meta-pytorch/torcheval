@@ -8,7 +8,6 @@
 
 
 import torch
-
 from torcheval.metrics import BinaryBinnedAUROC, MulticlassBinnedAUROC
 from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,

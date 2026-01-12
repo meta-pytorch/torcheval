@@ -12,7 +12,6 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
-
 from torcheval.metrics.functional.classification.confusion_matrix import (
     _binary_confusion_matrix_update,
     _confusion_matrix_compute,

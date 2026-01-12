@@ -99,9 +99,9 @@ class TestFAD(unittest.TestCase):
             targets=preprocess(background_audio),
         )
         fad1 = fad.compute().cpu().numpy()
-        assert np.isclose(
-            fad1, ref_fad1, atol=0.05
-        ), f"Calculated FAD1 is {fad1} where as expected is {ref_fad1}."
+        assert np.isclose(fad1, ref_fad1, atol=0.05), (
+            f"Calculated FAD1 is {fad1} where as expected is {ref_fad1}."
+        )
 
         fad.reset()
         fad.update(
@@ -113,9 +113,9 @@ class TestFAD(unittest.TestCase):
             targets=preprocess(background_audio[2:, ...]),
         )
         fad2 = fad.compute().cpu().numpy()
-        assert np.isclose(
-            fad2, ref_fad2, atol=0.05
-        ), f"Calculated FAD2 is {fad2} where as expected is {ref_fad2}."
+        assert np.isclose(fad2, ref_fad2, atol=0.05), (
+            f"Calculated FAD2 is {fad2} where as expected is {ref_fad2}."
+        )
 
     def test_vggish_fad_merge(self) -> None:
         """FrechetAudioDistance correctly computes distances using TorchAudio's pretrained VGGish model
@@ -143,6 +143,6 @@ class TestFAD(unittest.TestCase):
         )
         fads[0].merge_state(fads[1:])
         fad = fads[0].compute().cpu().numpy()
-        assert np.isclose(
-            fad, ref_fad, atol=0.05
-        ), f"Calculated FAD of {fad}; expected {ref_fad}."
+        assert np.isclose(fad, ref_fad, atol=0.05), (
+            f"Calculated FAD of {fad}; expected {ref_fad}."
+        )
