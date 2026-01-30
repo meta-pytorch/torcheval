@@ -458,8 +458,8 @@ def _test_complex_mixed_state(dst_rank: int | None = None) -> None:
         tc.assertTrue(all("seen" in synced_states[i][_METRIC_NAME] for i in range(2)))
         tc.assertTrue(all("total" in synced_states[i][_METRIC_NAME] for i in range(2)))
 
-        tc.assertEquals(len(synced_states[0][_METRIC_NAME]["seen"]), 2)
-        tc.assertEquals(len(synced_states[1][_METRIC_NAME]["seen"]), 3)
+        tc.assertEqual(len(synced_states[0][_METRIC_NAME]["seen"]), 2)
+        tc.assertEqual(len(synced_states[1][_METRIC_NAME]["seen"]), 3)
 
         torch.testing.assert_close(
             synced_states[0][_METRIC_NAME]["total"], torch.tensor(1, device=device)
@@ -507,8 +507,8 @@ def _test_empty_tensor_list_sync_state(dst_rank: int | None = None) -> None:
         tc.assertTrue(all("seen" in synced_states[i][_METRIC_NAME] for i in range(2)))
         tc.assertTrue(all("total" in synced_states[i][_METRIC_NAME] for i in range(2)))
 
-        tc.assertEquals(len(synced_states[0][_METRIC_NAME]["seen"]), 2)
-        tc.assertEquals(len(synced_states[1][_METRIC_NAME]["seen"]), 0)
+        tc.assertEqual(len(synced_states[0][_METRIC_NAME]["seen"]), 2)
+        tc.assertEqual(len(synced_states[1][_METRIC_NAME]["seen"]), 0)
     else:
         tc.assertIsNone(synced_states)
 
