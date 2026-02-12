@@ -69,7 +69,7 @@ def _psnr_update(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     _psnr_input_check(input, target)
     sum_squared_error = torch.sum(torch.pow(input - target, 2))
-    num_observations = torch.tensor(target.numel(), device=target.device)
+    num_observations = torch.full((), target.numel(), device=target.device)
     return sum_squared_error, num_observations
 
 
