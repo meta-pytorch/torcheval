@@ -129,13 +129,17 @@ class TestBinaryNormalizedEntropy(unittest.TestCase):
                 torch.randint(0, 2, (5,)),
                 weight=torch.randint(0, 20, (3,)),
             )
-        with self.assertRaisesRegex(
-            ValueError,
-            "`input` should be probability",
-        ):
-            binary_normalized_entropy(
-                torch.rand((5,)) * 10.0,
-                torch.randint(0, 2, (5,)),
-                weight=None,
-                from_logits=False,
-            )
+        # Range check commented out in D98589563: input.max()/min() on GPU
+        # tensors triggers cudaStreamSynchronize. Test removed since the check
+        # is disabled. TODO(T262340351): restore when sync-free alternative lands.
+        #
+        # with self.assertRaisesRegex(
+        #     ValueError,
+        #     "`input` should be probability",
+        # ):
+        #     binary_normalized_entropy(
+        #         torch.rand((5,)) * 10.0,
+        #         torch.randint(0, 2, (5,)),
+        #         weight=None,
+        #         from_logits=False,
+        #     )

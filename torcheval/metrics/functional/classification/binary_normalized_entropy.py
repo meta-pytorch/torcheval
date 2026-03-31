@@ -143,11 +143,18 @@ def _ne_input_check(
             f"`num_tasks = {num_tasks}`, `input`'s shape is expected to be ({num_tasks}, num_samples), but got shape ({input.shape})."
         )
 
-    input_max = input.max()
-    input_min = input.min()
-    if not from_logits and (input_max > 1.0 or input_min < 0.0):
-        raise ValueError(
-            f"`from_logits`={from_logits}, `input` should be probability in range [0., 1.], but got `input` ranging",
-            f"from {input_min} to {input_max}.",
-            "Please set `from_logits = True` or convert `input` into valid probability value. ",
-        )
+    # Range check commented out (D98589563): input.max()/min() on GPU tensors
+    # triggers cudaStreamSynchronize via implicit tensor.item(), blocking 3-5s
+    # per batch. This check has never fired in production (zero hits in
+    # ai_error_classification over 1 year). BCE already validates [0,1] in ATen.
+    # TODO(T262340351): Re-enable with a sync-free alternative (e.g.,
+    # torch._assert_async or deferred validation).
+    #
+    # input_max = input.max()
+    # input_min = input.min()
+    # if not from_logits and (input_max > 1.0 or input_min < 0.0):
+    #     raise ValueError(
+    #         f"`from_logits`={from_logits}, `input` should be probability in range [0., 1.], but got `input` ranging",
+    #         f"from {input_min} to {input_max}.",
+    #         "Please set `from_logits = True` or convert `input` into valid probability value. ",
+    #     )
