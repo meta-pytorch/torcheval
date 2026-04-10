@@ -380,7 +380,7 @@ class TestTopKAccuracy(unittest.TestCase):
         )
         target = torch.tensor([0, 0, 0, 0, 2, 2])
 
-        compute_result = torch.tensor([1.0, np.NAN, 0, np.NAN])
+        compute_result = torch.tensor([1.0, np.nan, 0, np.nan])
         torch.testing.assert_close(
             multiclass_accuracy(input, target, average=None, num_classes=4, k=2),
             compute_result,
@@ -389,7 +389,7 @@ class TestTopKAccuracy(unittest.TestCase):
             rtol=1e-5,
         )
 
-        compute_result = torch.tensor([1.0, np.NAN, 1.0, np.NAN])
+        compute_result = torch.tensor([1.0, np.nan, 1.0, np.nan])
         torch.testing.assert_close(
             multiclass_accuracy(input, target, average=None, num_classes=4, k=4),
             compute_result,

@@ -364,7 +364,7 @@ class TestTopKAccuracy(MetricClassTester):
             ]
         )
         target = torch.tensor([[0, 0], [0, 0], [0, 0], [2, 2]])
-        compute_result = torch.tensor([1.0, np.NAN, 0, np.NAN])
+        compute_result = torch.tensor([1.0, np.nan, 0, np.nan])
         self.run_class_implementation_tests(
             metric=MulticlassAccuracy(k=2, average=None, num_classes=4),
             state_names={"num_correct", "num_total"},

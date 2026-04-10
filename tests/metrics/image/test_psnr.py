@@ -8,6 +8,8 @@
 
 
 import torch
+
+# pyre-ignore[21]: Could not find a name `peak_signal_noise_ratio` defined in module `skimage.metrics`.
 from skimage.metrics import peak_signal_noise_ratio as skimage_peak_signal_noise_ratio
 from torcheval.metrics import PeakSignalNoiseRatio
 from torcheval.utils.test_utils.metric_class_tester import (
@@ -47,8 +49,11 @@ class TestPeakSignalNoiseRatio(MetricClassTester):
         target_np = target.numpy().ravel()
 
         skimage_result = torch.tensor(
-            skimage_peak_signal_noise_ratio(
-                image_true=target_np, image_test=input_np, data_range=data_range
+            float(
+                # pyre-ignore[16]: Module `skimage.metrics` has no attribute `peak_signal_noise_ratio`.
+                skimage_peak_signal_noise_ratio(
+                    image_true=target_np, image_test=input_np, data_range=data_range
+                )
             )
         )
 

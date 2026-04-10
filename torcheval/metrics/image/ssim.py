@@ -16,6 +16,7 @@ from typing import TypeVar
 import torch
 
 if find_spec("skimage") is not None:
+    # pyre-ignore[21]: Could not find a name `structural_similarity` defined in module `skimage.metrics`.
     from skimage.metrics import structural_similarity
 
     _SKIMAGE_AVAILABLE = True
@@ -82,7 +83,8 @@ class StructuralSimilarity(Metric[torch.Tensor]):
             mssim = structural_similarity(
                 images_1[idx].permute(1, 2, 0).detach().cpu().numpy(),
                 images_2[idx].permute(1, 2, 0).detach().cpu().numpy(),
-                multichannel=True,
+                channel_axis=-1,
+                data_range=2.0,
             )
             self.mssim_sum += mssim
 
