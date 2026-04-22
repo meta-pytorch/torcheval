@@ -58,6 +58,7 @@ class TestBinaryBinnedAUROC(unittest.TestCase):
                 target.to("cuda"),
                 num_tasks,
                 threshold.to("cuda"),
+                # pyrefly: ignore [bad-argument-type]
                 tuple([c.to("cuda") for c in compute_result]),
             )
 
@@ -80,6 +81,7 @@ class TestBinaryBinnedAUROC(unittest.TestCase):
                 target.to("cuda"),
                 num_tasks,
                 threshold.to("cuda"),
+                # pyrefly: ignore [bad-argument-type]
                 tuple([c.to("cuda") for c in compute_result]),
             )
 
@@ -101,6 +103,7 @@ class TestBinaryBinnedAUROC(unittest.TestCase):
                 target.to("cuda"),
                 num_tasks,
                 threshold,
+                # pyrefly: ignore [bad-argument-type]
                 tuple([c.to("cuda") for c in compute_result]),
             )
 
@@ -208,6 +211,7 @@ class TestMulticlassBinnedAUROC(unittest.TestCase):
                 target.to("cuda"),
                 num_classes,
                 threshold,
+                # pyrefly: ignore [bad-argument-type]
                 tuple([c.to("cuda") for c in compute_result]),
             )
 
@@ -230,6 +234,7 @@ class TestMulticlassBinnedAUROC(unittest.TestCase):
                 target.to("cuda"),
                 num_classes,
                 threshold,
+                # pyrefly: ignore [bad-argument-type]
                 tuple([c.to("cuda") for c in compute_result]),
                 average=None,
             )

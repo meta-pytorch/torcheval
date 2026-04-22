@@ -162,4 +162,5 @@ def _get_ngrams(sentence: Sequence[str], n_gram: int) -> Counter[str]:
         for i in range(0, len(sentence) - n_val + 1):
             ngram = tuple(sentence[i : i + n_val])
             ngram_counts[ngram] += 1
+    # pyrefly: ignore [bad-return]
     return ngram_counts

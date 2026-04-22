@@ -44,9 +44,14 @@ def click_through_rate(
         tensor([0.6667, 0.4])
     """
     if weights is None:
+        # pyrefly: ignore [bad-assignment]
         weights = 1.0
     click_total, weight_total = _click_through_rate_update(
-        input, weights, num_tasks=num_tasks
+        # pyrefly: ignore [bad-argument-type]
+        input,
+        # pyrefly: ignore [bad-argument-type]
+        weights,
+        num_tasks=num_tasks,
     )
     return _click_through_rate_compute(click_total, weight_total)
 

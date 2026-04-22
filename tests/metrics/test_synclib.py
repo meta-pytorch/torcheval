@@ -256,38 +256,50 @@ def _test_tensor_sync_state(dst_rank: int | None = None) -> None:
 
     if dst_rank is None or dist.get_rank() == dst_rank:
         tc.assertIsNotNone(synced_states)
+        # pyrefly: ignore [bad-argument-type]
         tc.assertEqual(len(synced_states), 3)
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i]) == 1 for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(_METRIC_NAME in synced_states[i] for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i][_METRIC_NAME]) == 2 for i in range(3)))
         tc.assertTrue(
+            # pyrefly: ignore [unsupported-operation]
             all("num_correct" in synced_states[i][_METRIC_NAME] for i in range(3))
         )
         tc.assertTrue(
+            # pyrefly: ignore [unsupported-operation]
             all("num_total" in synced_states[i][_METRIC_NAME] for i in range(3))
         )
 
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[0][_METRIC_NAME]["num_correct"],
             torch.tensor(11.0, device=device),
         )
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[0][_METRIC_NAME]["num_total"],
             torch.tensor(80.0, device=device),
         )
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[1][_METRIC_NAME]["num_correct"],
             torch.tensor(43.0, device=device),
         )
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[1][_METRIC_NAME]["num_total"],
             torch.tensor(50.0, device=device),
         )
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[2][_METRIC_NAME]["num_correct"],
             torch.tensor(51.0, device=device),
         )
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[2][_METRIC_NAME]["num_total"],
             torch.tensor(60.0, device=device),
         )
@@ -333,31 +345,48 @@ def _test_tensor_list_sync_state(dst_rank: int | None = None) -> None:
 
     if dst_rank is None or dist.get_rank() == dst_rank:
         tc.assertIsNotNone(synced_states)
+        # pyrefly: ignore [bad-argument-type]
         tc.assertEqual(len(synced_states), 3)
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i]) == 1 for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(_METRIC_NAME in synced_states[i] for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i][_METRIC_NAME]) == 2 for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all("seen" in synced_states[i][_METRIC_NAME] for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all("total" in synced_states[i][_METRIC_NAME] for i in range(3)))
 
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[0][_METRIC_NAME]["seen"],
             [torch.tensor(1, device=device), torch.tensor(3, device=device)],
         )
         torch.testing.assert_close(
-            synced_states[0][_METRIC_NAME]["total"], [torch.tensor(1, device=device)]
+            # pyrefly: ignore [unsupported-operation]
+            synced_states[0][_METRIC_NAME]["total"],
+            [torch.tensor(1, device=device)],
         )
         torch.testing.assert_close(
-            synced_states[1][_METRIC_NAME]["seen"], [torch.tensor(1, device=device)]
+            # pyrefly: ignore [unsupported-operation]
+            synced_states[1][_METRIC_NAME]["seen"],
+            [torch.tensor(1, device=device)],
         )
         torch.testing.assert_close(
-            synced_states[1][_METRIC_NAME]["total"], [torch.tensor(1, device=device)]
+            # pyrefly: ignore [unsupported-operation]
+            synced_states[1][_METRIC_NAME]["total"],
+            [torch.tensor(1, device=device)],
         )
         torch.testing.assert_close(
-            synced_states[2][_METRIC_NAME]["seen"], [torch.tensor(1, device=device)]
+            # pyrefly: ignore [unsupported-operation]
+            synced_states[2][_METRIC_NAME]["seen"],
+            [torch.tensor(1, device=device)],
         )
         torch.testing.assert_close(
-            synced_states[2][_METRIC_NAME]["total"], [torch.tensor(1, device=device)]
+            # pyrefly: ignore [unsupported-operation]
+            synced_states[2][_METRIC_NAME]["total"],
+            [torch.tensor(1, device=device)],
         )
     else:
         tc.assertIsNone(synced_states)
@@ -394,22 +423,27 @@ def _test_tensor_dict_sync_state(dst_rank: int | None = None) -> None:
     tc = unittest.TestCase()
     if dst_rank is None or dist.get_rank() == dst_rank:
         tc.assertIsNotNone(synced_states)
+        # pyrefly: ignore [bad-argument-type]
         tc.assertEqual(len(synced_states), 2)
 
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[0][_METRIC_NAME]["mapping"]["a"],
             torch.tensor(1, device=device),
         )
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[1][_METRIC_NAME]["mapping"]["a"],
             torch.tensor(2, device=device),
         )
 
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[0][_METRIC_NAME]["mapping"]["b"],
             torch.tensor(10, device=device),
         )
         torch.testing.assert_close(
+            # pyrefly: ignore [unsupported-operation]
             synced_states[1][_METRIC_NAME]["mapping"]["b"],
             torch.tensor(20, device=device),
         )
@@ -451,21 +485,33 @@ def _test_complex_mixed_state(dst_rank: int | None = None) -> None:
 
     if dst_rank is None or dist.get_rank() == dst_rank:
         tc.assertIsNotNone(synced_states)
+        # pyrefly: ignore [bad-argument-type]
         tc.assertEqual(len(synced_states), 2)
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i]) == 1 for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(_METRIC_NAME in synced_states[i] for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i][_METRIC_NAME]) == 2 for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all("seen" in synced_states[i][_METRIC_NAME] for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all("total" in synced_states[i][_METRIC_NAME] for i in range(2)))
 
+        # pyrefly: ignore [unsupported-operation]
         tc.assertEqual(len(synced_states[0][_METRIC_NAME]["seen"]), 2)
+        # pyrefly: ignore [unsupported-operation]
         tc.assertEqual(len(synced_states[1][_METRIC_NAME]["seen"]), 3)
 
         torch.testing.assert_close(
-            synced_states[0][_METRIC_NAME]["total"], torch.tensor(1, device=device)
+            # pyrefly: ignore [unsupported-operation]
+            synced_states[0][_METRIC_NAME]["total"],
+            torch.tensor(1, device=device),
         )
         torch.testing.assert_close(
-            synced_states[1][_METRIC_NAME]["total"], torch.tensor(2, device=device)
+            # pyrefly: ignore [unsupported-operation]
+            synced_states[1][_METRIC_NAME]["total"],
+            torch.tensor(2, device=device),
         )
     else:
         tc.assertIsNone(synced_states)
@@ -500,14 +546,22 @@ def _test_empty_tensor_list_sync_state(dst_rank: int | None = None) -> None:
     tc = unittest.TestCase()
     if dst_rank is None or dist.get_rank() == dst_rank:
         tc.assertIsNotNone(synced_states)
+        # pyrefly: ignore [bad-argument-type]
         tc.assertEqual(len(synced_states), 2)
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i]) == 1 for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(_METRIC_NAME in synced_states[i] for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i][_METRIC_NAME]) == 2 for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all("seen" in synced_states[i][_METRIC_NAME] for i in range(2)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all("total" in synced_states[i][_METRIC_NAME] for i in range(2)))
 
+        # pyrefly: ignore [unsupported-operation]
         tc.assertEqual(len(synced_states[0][_METRIC_NAME]["seen"]), 2)
+        # pyrefly: ignore [unsupported-operation]
         tc.assertEqual(len(synced_states[1][_METRIC_NAME]["seen"]), 0)
     else:
         tc.assertIsNone(synced_states)
@@ -547,22 +601,34 @@ def _test_numeric_sync_state(dst_rank: int | None = None) -> None:
     tc = unittest.TestCase()
     if dst_rank is None or dist.get_rank() == dst_rank:
         tc.assertIsNotNone(synced_states)
+        # pyrefly: ignore [bad-argument-type]
         tc.assertEqual(len(synced_states), 3)
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i]) == 1 for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(_METRIC_NAME in synced_states[i] for i in range(3)))
+        # pyrefly: ignore [unsupported-operation]
         tc.assertTrue(all(len(synced_states[i][_METRIC_NAME]) == 2 for i in range(3)))
         tc.assertTrue(
+            # pyrefly: ignore [unsupported-operation]
             all("num_correct" in synced_states[i][_METRIC_NAME] for i in range(3))
         )
         tc.assertTrue(
+            # pyrefly: ignore [unsupported-operation]
             all("num_total" in synced_states[i][_METRIC_NAME] for i in range(3))
         )
 
+        # pyrefly: ignore [unsupported-operation]
         torch.testing.assert_close(synced_states[0][_METRIC_NAME]["num_correct"], 11)
+        # pyrefly: ignore [unsupported-operation]
         torch.testing.assert_close(synced_states[0][_METRIC_NAME]["num_total"], 80)
+        # pyrefly: ignore [unsupported-operation]
         torch.testing.assert_close(synced_states[1][_METRIC_NAME]["num_correct"], 43)
+        # pyrefly: ignore [unsupported-operation]
         torch.testing.assert_close(synced_states[1][_METRIC_NAME]["num_total"], 50)
+        # pyrefly: ignore [unsupported-operation]
         torch.testing.assert_close(synced_states[2][_METRIC_NAME]["num_correct"], 51.0)
+        # pyrefly: ignore [unsupported-operation]
         torch.testing.assert_close(synced_states[2][_METRIC_NAME]["num_total"], 60.0)
     else:
         tc.assertIsNone(synced_states)

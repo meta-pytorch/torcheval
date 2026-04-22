@@ -253,6 +253,7 @@ def get_synced_metric(
     if world_size == 1:
         return metric
 
+    # pyrefly: ignore [no-matching-overload]
     gathered_metric_list = _sync_metric_object(
         metric,
         # pyre-fixme[6]: For 2nd param expected `ProcessGroup` but got `Union[None,
@@ -272,6 +273,7 @@ def get_synced_metric(
 def get_synced_metric_collection(
     metric_collection: MutableMapping[str, Metric],
     process_group: dist.ProcessGroup | None = None,
+    # pyrefly: ignore [bad-return]
 ) -> dict[str, Metric] | MutableMapping[str, Metric]:
     """
     Returns a dict of metric objects to all ranks whose
@@ -310,6 +312,7 @@ def get_synced_metric_collection(
     if world_size == 1:
         return metric_collection
 
+    # pyrefly: ignore [no-matching-overload]
     list_of_metric_collections = _sync_metric_object(
         metric_collection,
         # pyre-fixme[6]: For 2nd param expected `ProcessGroup` but got `Union[None,
@@ -445,6 +448,7 @@ def _sync_metric_object(
                     rank_data[metric_name]
                 )
             gathered_data_list.append(rank_dict)
+    # pyrefly: ignore [bad-return]
     return gathered_data_list
 
 

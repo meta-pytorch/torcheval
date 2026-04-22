@@ -170,15 +170,20 @@ class Metric(Generic[TComputeReturn], ABC):
             if isinstance(value, torch.Tensor):
                 state_dict[state_name] = value.detach().clone()
             elif isinstance(value, list):
+                # pyrefly: ignore [unsupported-operation]
                 state_dict[state_name] = [tensor.detach().clone() for tensor in value]
             elif isinstance(value, dict):
+                # pyrefly: ignore [unsupported-operation]
                 state_dict[state_name] = {
                     key: tensor.detach().clone() for key, tensor in value.items()
                 }
             elif isinstance(value, int):
+                # pyrefly: ignore [unsupported-operation]
                 state_dict[state_name] = value
             elif isinstance(value, float):
+                # pyrefly: ignore [unsupported-operation]
                 state_dict[state_name] = value
+        # pyrefly: ignore [bad-return]
         return state_dict
 
     def load_state_dict(

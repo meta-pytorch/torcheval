@@ -132,9 +132,12 @@ class MetricClassTester(unittest.TestCase):
         )
 
         if test_devices is None:
+            # pyrefly: ignore [bad-assignment]
             test_devices = ("cpu", "cuda") if torch.cuda.is_available() else ("cpu",)
 
+        # pyrefly: ignore [not-iterable]
         for device in test_devices:
+            # pyrefly: ignore [bad-assignment]
             self._test_case_spec.device = device
             self._test_case_spec = copy_data_to_device(
                 self._test_case_spec, torch.device(self._test_case_spec.device)
@@ -150,7 +153,10 @@ class MetricClassTester(unittest.TestCase):
         pickled_metric = pickle.dumps(metric)
         loaded_metric = pickle.loads(pickled_metric)
         self.assert_state_unchanged(
-            self._test_case_spec.state_names, loaded_metric, metric
+            # pyrefly: ignore [missing-attribute]
+            self._test_case_spec.state_names,
+            loaded_metric,
+            metric,
         )
         self.assertTrue(hash(metric))
 
@@ -158,25 +164,38 @@ class MetricClassTester(unittest.TestCase):
         test_metric = deepcopy(metric).reset()
         test_metric.load_state_dict(metric.state_dict())
         self.assert_state_unchanged(
-            self._test_case_spec.state_names, test_metric, metric
+            # pyrefly: ignore [missing-attribute]
+            self._test_case_spec.state_names,
+            test_metric,
+            metric,
         )
 
     def _test_init(self) -> None:
+        # pyrefly: ignore [missing-attribute]
         metric = self._test_case_spec.metric
         self.assertEqual(
-            set(metric._state_name_to_default.keys()), self._test_case_spec.state_names
+            # pyrefly: ignore [missing-attribute]
+            set(metric._state_name_to_default.keys()),
+            # pyrefly: ignore [missing-attribute]
+            self._test_case_spec.state_names,
         )
         self._test_metric_pickable_hashable(metric)
         self._test_state_dict_load_state_dict(metric)
 
     def _test_update_and_compute(self) -> None:
         result = None
+        # pyrefly: ignore [missing-attribute]
         test_metric = deepcopy(self._test_case_spec.metric)
+        # pyrefly: ignore [missing-attribute]
         for i in range(self._test_case_spec.num_total_updates):
             # test chainable call
             current_batch_update_kwargs = {
-                k: v[i] for k, v in self._test_case_spec.update_kwargs.items()
+                # pyrefly: ignore [missing-attribute]
+                k: v[i]
+                # pyrefly: ignore [missing-attribute]
+                for k, v in self._test_case_spec.update_kwargs.items()
             }
+            # pyrefly: ignore [missing-attribute]
             if i >= self._test_case_spec.min_updates_before_compute:
                 result = test_metric.update(**current_batch_update_kwargs).compute()
             else:
@@ -186,8 +205,11 @@ class MetricClassTester(unittest.TestCase):
         # compute result from single process should be same as one merged from multiple processes
         assert_result_close(
             final_computation_result,
+            # pyrefly: ignore [missing-attribute]
             self._test_case_spec.compute_result,
+            # pyrefly: ignore [missing-attribute]
             atol=self._test_case_spec.atol,
+            # pyrefly: ignore [missing-attribute]
             rtol=self._test_case_spec.rtol,
         )
         # compute should be idempotent
@@ -196,18 +218,26 @@ class MetricClassTester(unittest.TestCase):
         self._test_state_dict_load_state_dict(test_metric)
 
     def _test_merge_state(self, test_merge_with_one_update: bool) -> None:
+        # pyrefly: ignore [missing-attribute]
         num_processes = self._test_case_spec.num_processes
+        # pyrefly: ignore [missing-attribute]
         num_total_updates = self._test_case_spec.num_total_updates
+        # pyrefly: ignore [missing-attribute]
         state_names = self._test_case_spec.state_names
         test_metrics: list[Metric] = [
-            deepcopy(self._test_case_spec.metric) for i in range(num_processes)
+            # pyrefly: ignore [missing-attribute]
+            deepcopy(self._test_case_spec.metric)
+            for i in range(num_processes)
         ]
 
         # test merge when there's only one update happened in one metric instance.
         if test_merge_with_one_update:
             test_metric_0_copy = deepcopy(test_metrics[0])
             first_update_param = {
-                k: v[0] for k, v in self._test_case_spec.update_kwargs.items()
+                # pyrefly: ignore [missing-attribute]
+                k: v[0]
+                # pyrefly: ignore [missing-attribute]
+                for k, v in self._test_case_spec.update_kwargs.items()
             }
             result_before_merge = test_metric_0_copy.update(
                 **first_update_param
@@ -240,9 +270,11 @@ class MetricClassTester(unittest.TestCase):
             for j in range(num_total_updates // num_processes):
                 metric_i_current_batch_update_kwargs = {
                     k: v[i * num_total_updates // num_processes + j]
+                    # pyrefly: ignore [missing-attribute]
                     for k, v in self._test_case_spec.update_kwargs.items()
                 }
                 test_metrics[i].update(**metric_i_current_batch_update_kwargs)
+                # pyrefly: ignore [missing-attribute]
                 if j >= self._test_case_spec.min_updates_before_compute:
                     test_metrics[i].compute()
         test_metrics_unmerged = [deepcopy(metric) for metric in test_metrics]
@@ -251,8 +283,11 @@ class MetricClassTester(unittest.TestCase):
         )
         assert_result_close(
             final_computation_result,
+            # pyrefly: ignore [missing-attribute]
             self._test_case_spec.merge_and_compute_result,
+            # pyrefly: ignore [missing-attribute]
             atol=self._test_case_spec.atol,
+            # pyrefly: ignore [missing-attribute]
             rtol=self._test_case_spec.rtol,
         )
 
@@ -273,13 +308,16 @@ class MetricClassTester(unittest.TestCase):
 
         # metric can still be updated and computed after merged
         test_metrics[0].update(
+            # pyrefly: ignore [missing-attribute]
             **{k: v[0] for k, v in self._test_case_spec.update_kwargs.items()}
         ).compute()
 
         # merge metrics on different devices
         if torch.cuda.is_available():
             test_metrics_copy = [deepcopy(metric) for metric in test_metrics]
+            # pyrefly: ignore [missing-attribute]
             past_device_type = self._test_case_spec.device
+            # pyrefly: ignore [missing-attribute]
             new_device_type = "cuda" if self._test_case_spec.device == "cpu" else "cuda"
             self.assertEqual(test_metrics_copy[0]._device.type, past_device_type)
             test_metrics_copy[0].to(new_device_type).merge_state(test_metrics_copy[1:])
@@ -301,6 +339,7 @@ class MetricClassTester(unittest.TestCase):
         lc = pet.LaunchConfig(
             min_nodes=1,
             max_nodes=1,
+            # pyrefly: ignore [missing-attribute]
             nproc_per_node=self._test_case_spec.num_processes,
             run_id=str(uuid.uuid4()),
             rdzv_backend="c10d",

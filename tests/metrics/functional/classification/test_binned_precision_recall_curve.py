@@ -56,6 +56,7 @@ class TestBinaryBinnedPrecisionRecallCurve(unittest.TestCase):
                 input.to("cuda"),
                 target.to("cuda"),
                 threshold.to("cuda"),
+                # pyrefly: ignore [bad-argument-type]
                 tuple([c.to("cuda") for c in compute_result]),
             )
 
@@ -85,6 +86,7 @@ class TestBinaryBinnedPrecisionRecallCurve(unittest.TestCase):
                 input.to("cuda"),
                 target.to("cuda"),
                 threshold,
+                # pyrefly: ignore [bad-argument-type]
                 tuple([c.to("cuda") for c in compute_result]),
             )
 

@@ -85,26 +85,36 @@ class FrechetInceptionDistance(Metric[torch.Tensor]):
 
         super().__init__(device=device)
 
+        # pyrefly: ignore [missing-attribute]
         self._FID_parameter_check(model=model, feature_dim=feature_dim)
 
         if model is None:
             model = FIDInceptionV3()
 
         # Set the model and put it in evaluation mode
+        # pyrefly: ignore [missing-attribute]
         self.model = model.to(device)
+        # pyrefly: ignore [missing-attribute]
         self.model.eval()
+        # pyrefly: ignore [missing-attribute]
         self.model.requires_grad_(False)
 
         # Initialize state variables used to compute FID
+        # pyrefly: ignore [missing-attribute]
         self._add_state("real_sum", torch.zeros(feature_dim, device=device))
+        # pyrefly: ignore [missing-attribute]
         self._add_state(
             "real_cov_sum", torch.zeros((feature_dim, feature_dim), device=device)
         )
+        # pyrefly: ignore [missing-attribute]
         self._add_state("fake_sum", torch.zeros(feature_dim, device=device))
+        # pyrefly: ignore [missing-attribute]
         self._add_state(
             "fake_cov_sum", torch.zeros((feature_dim, feature_dim), device=device)
         )
+        # pyrefly: ignore [missing-attribute]
         self._add_state("num_real_images", torch.tensor(0, device=device).int())
+        # pyrefly: ignore [missing-attribute]
         self._add_state("num_fake_images", torch.tensor(0, device=device).int())
 
     @torch.inference_mode()
@@ -120,23 +130,32 @@ class FrechetInceptionDistance(Metric[torch.Tensor]):
             is_real (Boolean): Denotes if images are real or not.
         """
 
+        # pyrefly: ignore [missing-attribute]
         self._FID_update_input_check(images=images, is_real=is_real)
 
+        # pyrefly: ignore [missing-attribute]
         images = images.to(self.device)
 
         # Compute activations for images using the given model
+        # pyrefly: ignore [missing-attribute]
         activations = self.model(images)
 
         batch_size = images.shape[0]
 
         # Update the state variables used to compute FID
         if is_real:
+            # pyrefly: ignore [missing-attribute]
             self.num_real_images += batch_size
+            # pyrefly: ignore [missing-attribute]
             self.real_sum += torch.sum(activations, dim=0)
+            # pyrefly: ignore [missing-attribute]
             self.real_cov_sum += torch.matmul(activations.T, activations)
         else:
+            # pyrefly: ignore [missing-attribute]
             self.num_fake_images += batch_size
+            # pyrefly: ignore [missing-attribute]
             self.fake_sum += torch.sum(activations, dim=0)
+            # pyrefly: ignore [missing-attribute]
             self.fake_cov_sum += torch.matmul(activations.T, activations)
 
         return self
@@ -152,11 +171,17 @@ class FrechetInceptionDistance(Metric[torch.Tensor]):
             metrics (Iterable[FID]): The other FID instance(s) whose state will be merged into this instance.
         """
         for metric in metrics:
+            # pyrefly: ignore [missing-attribute]
             self.real_sum += metric.real_sum.to(self.device)
+            # pyrefly: ignore [missing-attribute]
             self.real_cov_sum += metric.real_cov_sum.to(self.device)
+            # pyrefly: ignore [missing-attribute]
             self.fake_sum += metric.fake_sum.to(self.device)
+            # pyrefly: ignore [missing-attribute]
             self.fake_cov_sum += metric.fake_cov_sum.to(self.device)
+            # pyrefly: ignore [missing-attribute]
             self.num_real_images += metric.num_real_images.to(self.device)
+            # pyrefly: ignore [missing-attribute]
             self.num_fake_images += metric.num_fake_images.to(self.device)
 
         return self
@@ -172,9 +197,11 @@ class FrechetInceptionDistance(Metric[torch.Tensor]):
 
         # If the user has not already updated with at lease one
         # image from each distribution, then we raise an Error.
+        # pyrefly: ignore [missing-attribute]
         if (self.num_real_images < 2) or (self.num_fake_images < 2):
             warnings.warn(
                 "Computing FID requires at least 2 real images and 2 fake images,"
+                # pyrefly: ignore [missing-attribute]
                 f"but currently running with {self.num_real_images} real images and {self.num_fake_images} fake images."
                 "Returning 0.0",
                 RuntimeWarning,
@@ -184,17 +211,23 @@ class FrechetInceptionDistance(Metric[torch.Tensor]):
             return torch.tensor(0.0)
 
         # Compute the mean activations for each distribution
+        # pyrefly: ignore [missing-attribute]
         real_mean = (self.real_sum / self.num_real_images).unsqueeze(0)
+        # pyrefly: ignore [missing-attribute]
         fake_mean = (self.fake_sum / self.num_fake_images).unsqueeze(0)
 
         # Compute the covariance matrices for each distribution
+        # pyrefly: ignore [missing-attribute]
         real_cov_num = self.real_cov_sum - self.num_real_images * torch.matmul(
             real_mean.T, real_mean
         )
+        # pyrefly: ignore [missing-attribute]
         real_cov = real_cov_num / (self.num_real_images - 1)
+        # pyrefly: ignore [missing-attribute]
         fake_cov_num = self.fake_cov_sum - self.num_fake_images * torch.matmul(
             fake_mean.T, fake_mean
         )
+        # pyrefly: ignore [missing-attribute]
         fake_cov = fake_cov_num / (self.num_fake_images - 1)
 
         # Compute the Frechet Distance between the distributions
@@ -236,6 +269,7 @@ class FrechetInceptionDistance(Metric[torch.Tensor]):
                 f"Expected 'real' to be of type bool but got {type(is_real)}.",
             )
 
+        # pyrefly: ignore [missing-attribute]
         if isinstance(self.model, FIDInceptionV3):
             if images.dtype != torch.float32:
                 raise ValueError(
@@ -254,5 +288,6 @@ class FrechetInceptionDistance(Metric[torch.Tensor]):
         **kwargs: Any,
     ) -> TFrechetInceptionDistance:
         super().to(device=device)
+        # pyrefly: ignore [missing-attribute]
         self.model.to(self.device)
         return self

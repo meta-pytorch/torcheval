@@ -226,6 +226,7 @@ def _sync_dtype_and_shape(
         object_list = [None]
 
     dist.broadcast_object_list(object_list, src=rank_with_dtype, group=process_group)
+    # pyrefly: ignore [not-iterable]
     dtype, shape = object_list[0]
     return dtype, shape
 

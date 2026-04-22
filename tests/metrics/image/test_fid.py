@@ -155,6 +155,7 @@ class TestFrechetInceptionDistance(MetricClassTester):
             ValueError,
             "Expected tensor as input, but got .*",
         ):
+            # pyrefly: ignore [bad-argument-type]
             metric.update(np.random.rand(4, 3, 256, 256), is_real=True)
 
         with self.assertRaisesRegex(

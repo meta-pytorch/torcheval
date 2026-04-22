@@ -97,13 +97,19 @@ class FrechetAudioDistance(Metric[torch.Tensor]):
         Returns:
             torch.Tensor: the Fréchet distance between the accumulated predicted and target waveforms.
         """
+        # pyrefly: ignore [missing-attribute]
         target_mean = self.target_mean_partial / self.target_n
+        # pyrefly: ignore [missing-attribute]
         target_cov = self.target_cov_partial / (self.target_n - 1) - target_mean.T @ (
             target_mean
+            # pyrefly: ignore [missing-attribute]
         ) * self.target_n / (self.target_n - 1)
+        # pyrefly: ignore [missing-attribute]
         pred_mean = self.pred_mean_partial / self.pred_n
+        # pyrefly: ignore [missing-attribute]
         pred_cov = self.pred_cov_partial / (self.pred_n - 1) - pred_mean.T @ (
             pred_mean
+            # pyrefly: ignore [missing-attribute]
         ) * self.pred_n / (self.pred_n - 1)
         return gaussian_frechet_distance(
             pred_mean.squeeze(0),
@@ -125,11 +131,17 @@ class FrechetAudioDistance(Metric[torch.Tensor]):
             fads (Iterable[FrechetAudioDistance]): The other `FrechetAudioDistance` instances to merge states from.
         """
         for fad in fads:
+            # pyrefly: ignore [missing-attribute]
             self.pred_mean_partial += fad.pred_mean_partial
+            # pyrefly: ignore [missing-attribute]
             self.pred_cov_partial += fad.pred_cov_partial
+            # pyrefly: ignore [missing-attribute]
             self.pred_n += fad.pred_n
+            # pyrefly: ignore [missing-attribute]
             self.target_mean_partial += fad.target_mean_partial
+            # pyrefly: ignore [missing-attribute]
             self.target_cov_partial += fad.target_cov_partial
+            # pyrefly: ignore [missing-attribute]
             self.target_n += fad.target_n
         return self
 
