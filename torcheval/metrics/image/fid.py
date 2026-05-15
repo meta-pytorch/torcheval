@@ -51,6 +51,7 @@ class FIDInceptionV3(nn.Module):
         # pyre-ignore
         self.model = models.inception_v3(weights=weights)
         # Do not want fc layer
+        # pyrefly: ignore [bad-assignment]
         self.model.fc = nn.Identity()
 
     def forward(self, x: Tensor) -> Tensor:

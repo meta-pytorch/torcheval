@@ -36,6 +36,7 @@ class ResnetFeatureExtractor(nn.Module):
         # pyre-ignore
         self.model = models.resnet.resnet18(weights=weights)
         # Do not want fc layer
+        # pyrefly: ignore [bad-assignment]
         self.model.fc = nn.Identity()
         self.model.eval()
 
