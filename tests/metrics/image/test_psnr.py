@@ -23,6 +23,10 @@ from torcheval.utils.test_utils.metric_class_tester import (
 
 
 class TestPeakSignalNoiseRatio(MetricClassTester):
+    def setUp(self) -> None:
+        super().setUp()
+        torch.manual_seed(0)
+
     def _get_random_data_PeakSignalToNoiseRatio(
         self,
         num_updates: int,
@@ -70,6 +74,11 @@ class TestPeakSignalNoiseRatio(MetricClassTester):
             state_names=state_names,
             update_kwargs={"input": input, "target": target},
             compute_result=skimage_result.to(torch.float32),
+            # torcheval accumulates the sum of squared errors in float32 while
+            # skimage's reference runs in float64, so the default 1e-5 rtol is
+            # below the float32 noise floor for this many observations.
+            atol=1e-4,
+            rtol=1e-4,
         )
 
     def test_psnr_with_random_data(self) -> None:
