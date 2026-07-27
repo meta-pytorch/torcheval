@@ -58,6 +58,7 @@ def _simple_send_tensors(
 
     if rank is None:
         # sync tensors to all ranks
+        # pyrefly: ignore [no-matching-overload]
         dist.all_gather(gathered_result, tensor, group=group)
     else:
         # sync tensors only to specified rank
@@ -210,6 +211,7 @@ def _sync_dtype_and_shape(
         rank_with_dtype = my_rank  # send its rank
 
     object_list = [None for _ in range(world_size)]
+    # pyrefly: ignore [bad-argument-type]
     dist.all_gather_object(object_list, rank_with_dtype, group=process_group)
     # pyre-ignore: Incompatible parameter type [6]
     rank_with_dtype = max(object_list)  # choose highest rank to broadcast dtype
@@ -225,6 +227,7 @@ def _sync_dtype_and_shape(
     else:
         object_list = [None]
 
+    # pyrefly: ignore [bad-argument-type]
     dist.broadcast_object_list(object_list, src=rank_with_dtype, group=process_group)
     # pyrefly: ignore [not-iterable]
     dtype, shape = object_list[0]
@@ -239,6 +242,7 @@ def _sync_list_length(
     world_size = dist.get_world_size(group=process_group)
 
     lengths = [None for _ in range(world_size)]
+    # pyrefly: ignore [bad-argument-type]
     dist.all_gather_object(lengths, my_length, group=process_group)
 
     # pyre-ignore: Incompatible parameter type [7]
@@ -360,6 +364,7 @@ def _sync_obj_states(
 
     if rank is None:
         # if rank not specified, sync all ranks
+        # pyrefly: ignore [bad-argument-type]
         dist.all_gather_object(gathered_obj_data, my_state_data, group=process_group)
     else:
         # if rank is specified, send object only to that rank
