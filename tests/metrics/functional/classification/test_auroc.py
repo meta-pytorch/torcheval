@@ -116,6 +116,10 @@ class TestBinaryAUROC(unittest.TestCase):
 
 class TestMulticlassAUROC(unittest.TestCase):
     def test_auroc_base(self) -> None:
+        # Seed so the randomly drawn target deterministically contains every
+        # class. roc_auc_score(multi_class="ovr") raises when y_true is missing a
+        # class, which made this test fail intermittently on unlucky batches.
+        torch.manual_seed(0)
         num_classes = 4
         input = 10 * torch.randn(BATCH_SIZE, num_classes)
         input_prob = input.abs() / input.abs().sum(dim=-1, keepdim=True)
