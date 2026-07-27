@@ -433,6 +433,7 @@ class MultilabelBinnedAUPRC(Metric[torch.Tensor]):
         """
         input = input.to(self.device)
         target = target.to(self.device)
+        self.threshold = self.threshold.to(self.device)
 
         num_tp, num_fp, num_fn = _multilabel_binned_precision_recall_curve_update(
             input,
