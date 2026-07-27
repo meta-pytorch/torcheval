@@ -7,6 +7,8 @@
 # pyre-strict
 
 import copy
+import logging
+import time
 from collections.abc import Callable, Iterable
 from typing import Any
 
@@ -15,6 +17,39 @@ from torcheval.metrics.functional.frechet import gaussian_frechet_distance
 from torcheval.metrics.metric import Metric
 
 # pyre-ignore-all-errors[16]: Undefined attribute of metric states.
+
+logger: logging.Logger = logging.getLogger(__name__)
+
+_VGGISH_DOWNLOAD_MAX_ATTEMPTS = 4
+_VGGISH_DOWNLOAD_BACKOFF_S = 1.0
+
+
+def _get_vggish_model_with_retry(vggish: Any) -> Any:
+    """Loads TorchAudio's pretrained VGGish model, retrying the weight download.
+
+    ``vggish.get_model()`` lazily fetches ``models/vggish.pt`` from Manifold when
+    the local hub cache is cold; a single transient fetch error would otherwise
+    fail the caller nondeterministically. Manifold stages the download to a
+    separate file and only publishes it on full success, so reattempts are safe
+    and resume from partial progress.
+    """
+    backoff_s = _VGGISH_DOWNLOAD_BACKOFF_S
+    for attempt in range(1, _VGGISH_DOWNLOAD_MAX_ATTEMPTS):
+        try:
+            return vggish.get_model()
+        # Retry transient Manifold/network failures; a persistent error still
+        # surfaces from the final attempt below.
+        except Exception as e:
+            logger.warning(
+                "VGGish weight download failed on attempt %d/%d (%s); retrying in %.1fs",
+                attempt,
+                _VGGISH_DOWNLOAD_MAX_ATTEMPTS,
+                e,
+                backoff_s,
+            )
+            time.sleep(backoff_s)
+            backoff_s *= 2
+    return vggish.get_model()
 
 
 class FrechetAudioDistance(Metric[torch.Tensor]):
@@ -174,7 +209,7 @@ class FrechetAudioDistance(Metric[torch.Tensor]):
                 "Using the pretrained VGGish model requires the TorchAudio nightly binary as it is a prototype feature. "
                 "Please install the latest nightly version of ``torchaudio``."
             )
-        model = copy.deepcopy(VGGISH.get_model())
+        model = copy.deepcopy(_get_vggish_model_with_retry(VGGISH))
         model.embedding_network = torch.nn.Sequential(
             *list(model.embedding_network.children())[:-1]
         )

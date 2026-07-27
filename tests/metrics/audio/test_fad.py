@@ -7,10 +7,12 @@
 # pyre-strict
 
 import unittest
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import torch
 from torcheval.metrics import FrechetAudioDistance
+from torcheval.metrics.audio.fad import _VGGISH_DOWNLOAD_MAX_ATTEMPTS
 
 
 # pyre-fixme[24]: Generic type `np.ndarray` expects 2 type parameters.
@@ -148,3 +150,55 @@ class TestFAD(unittest.TestCase):
         assert np.isclose(fad, ref_fad, atol=0.05), (
             f"Calculated FAD of {fad}; expected {ref_fad}."
         )
+
+
+def _make_fake_vggish_model() -> torch.nn.Module:
+    model = torch.nn.Module()
+    model.embedding_network = torch.nn.Sequential(
+        torch.nn.Linear(1, 1), torch.nn.Linear(1, 1)
+    )
+    return model
+
+
+class TestWithVggishDownloadRetry(unittest.TestCase):
+    """`with_vggish` retries the flaky Manifold weight download rather than
+    failing on a single transient fetch error."""
+
+    def test_retries_transient_download_failure(self) -> None:
+        from torchaudio.prototype import pipelines
+
+        get_model_mock = MagicMock(
+            side_effect=[
+                RuntimeError("transient manifold error"),
+                _make_fake_vggish_model(),
+            ]
+        )
+        with (
+            patch.object(pipelines.VGGISH, "get_model", get_model_mock),
+            patch.object(
+                pipelines.VGGISH,
+                "get_input_processor",
+                MagicMock(return_value=lambda x: x),
+            ),
+            patch("torcheval.metrics.audio.fad.time.sleep") as sleep_mock,
+        ):
+            fad = FrechetAudioDistance.with_vggish()
+
+        self.assertIsInstance(fad, FrechetAudioDistance)
+        self.assertEqual(get_model_mock.call_count, 2)
+        sleep_mock.assert_called_once()
+
+    def test_raises_after_exhausting_download_retries(self) -> None:
+        from torchaudio.prototype import pipelines
+
+        get_model_mock = MagicMock(
+            side_effect=RuntimeError("persistent manifold error")
+        )
+        with (
+            patch.object(pipelines.VGGISH, "get_model", get_model_mock),
+            patch("torcheval.metrics.audio.fad.time.sleep"),
+        ):
+            with self.assertRaises(RuntimeError):
+                FrechetAudioDistance.with_vggish()
+
+        self.assertEqual(get_model_mock.call_count, _VGGISH_DOWNLOAD_MAX_ATTEMPTS)
