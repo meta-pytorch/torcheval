@@ -16,6 +16,7 @@ from torcheval.utils.test_utils.metric_class_tester import (
     BATCH_SIZE,
     IMG_CHANNELS,
     MetricClassTester,
+    NUM_PROCESSES,
     NUM_TOTAL_UPDATES,
 )
 from torchvision import models
@@ -67,16 +68,28 @@ class TestFrechetInceptionDistance(MetricClassTester):
 
         return imgs
 
+    # The default inception-v3 path is the CPU-heavy case: a full run interpolates
+    # every image to 299x299, forwards it through inception-v3, and repeatedly
+    # eigendecomposes the 2048x2048 covariance in compute(), which drifts toward
+    # the tpx timeout on contended hosts. Halving the update and process counts
+    # keeps the real 2048-d inception path under test while leaving ample margin.
+    _DEFAULT_MODEL_NUM_UPDATES = 4
+    _DEFAULT_MODEL_NUM_PROCESSES = 2
+
     def test_fid_random_data_default_model(self) -> None:
         imgs = self._get_random_data_FrechetInceptionDistance(
-            NUM_TOTAL_UPDATES,
+            self._DEFAULT_MODEL_NUM_UPDATES,
             BATCH_SIZE,
             IMG_CHANNELS,
             299,
             299,
         )
         self._test_fid(
-            imgs=imgs, feature_dim=2048, expected_result=torch.tensor(4.48304)
+            imgs=imgs,
+            feature_dim=2048,
+            expected_result=torch.tensor(6.00987),
+            num_total_updates=self._DEFAULT_MODEL_NUM_UPDATES,
+            num_processes=self._DEFAULT_MODEL_NUM_PROCESSES,
         )
 
     def test_fid_random_data_custom_model(self) -> None:
@@ -103,10 +116,12 @@ class TestFrechetInceptionDistance(MetricClassTester):
         feature_dim: int,
         expected_result: torch.Tensor,
         model: torch.nn.Module | None = None,
+        num_total_updates: int = NUM_TOTAL_UPDATES,
+        num_processes: int = NUM_PROCESSES,
     ) -> None:
         # create an alternating list of boolean values to
         # simulate a sequence of alternating real and generated images
-        real_or_gen = [idx % 2 == 0 for idx in range(NUM_TOTAL_UPDATES)]
+        real_or_gen = [idx % 2 == 0 for idx in range(num_total_updates)]
 
         state_names = {
             "real_sum",
@@ -125,6 +140,8 @@ class TestFrechetInceptionDistance(MetricClassTester):
                 "is_real": real_or_gen,
             },
             compute_result=expected_result,
+            num_total_updates=num_total_updates,
+            num_processes=num_processes,
             min_updates_before_compute=2,
             test_merge_with_one_update=False,
             atol=1e-2,
