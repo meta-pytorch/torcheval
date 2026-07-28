@@ -161,13 +161,17 @@ def _binary_auroc_compute(
 ) -> torch.Tensor:
     if use_fbgemm:
         assert input.is_cuda and target.is_cuda, "Tensors have to be on GPU"
-        # auroc does not have weight
-        weight = torch.ones_like(input, dtype=torch.double)
+        # auroc does not have weight. The fbgemm ``batch_auc`` kernel dispatches
+        # the weight tensor over float32/float16 only, so a double weight raises
+        # `"auc_wrapper_3" not implemented for 'Double'`.
+        weight = torch.ones_like(input, dtype=torch.float)
         num_tasks = 1 if len(input.shape) == 1 else input.shape[0]
         # FBGEMM AUC is an approximation of AUC. It does not mask data in case
         # that input values are redundant. For the highly redundant input case,
         # FBGEMM AUC can give a significantly different result
         auroc = fbgemm_gpu.metrics.auc(num_tasks, input, target, weight)
+        # Match the double dtype returned by the non-fbgemm path.
+        auroc = auroc.double()
         if num_tasks == 1:
             return auroc[0]
         else:
