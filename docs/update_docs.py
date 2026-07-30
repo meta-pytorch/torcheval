@@ -37,9 +37,9 @@ def get_submodule_vars(filename) -> tuple[str, list[str]]:
                 target = node.targets[0]
                 if isinstance(target, ast.Name):
                     if target.id == "__doc_name__":
-                        doc_name = node.value.s
+                        doc_name = node.value.value
                     elif target.id == "__all__":
-                        all_modules = [e.s for e in node.value.elts]
+                        all_modules = [e.value for e in node.value.elts]
 
     return doc_name, all_modules
 
