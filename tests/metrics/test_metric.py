@@ -350,19 +350,13 @@ class MetricBaseClassTest(unittest.TestCase):
         metric.reset()
         self.assertEqual(metric.sum.device.type, "cuda")
 
-    #  `torch.cuda.is_available()` to decorator factory `unittest.skipUnless`.
-    @unittest.skipUnless(
-        condition=torch.cuda.is_available(), reason="This test needs a GPU host to run."
-    )
     def test_to_device_state_tensor_list(self) -> None:
-        metric = DummySumListStateMetric().to("cuda")
-        metric.update(torch.tensor(1.0).to("cuda")).compute()
-        torch.testing.assert_close(metric.x, [torch.tensor(1.0, device="cuda")])
+        metric = DummySumListStateMetric()
+        metric.update(torch.tensor(1.0, dtype=torch.float32)).compute()
+        torch.testing.assert_close(metric.x, [torch.tensor(1.0, dtype=torch.float32)])
 
-        metric.to("cpu")
-        torch.testing.assert_close(metric.x, [torch.tensor(1.0, device="cpu")])
-        metric.to("cuda")
-        torch.testing.assert_close(metric.x, [torch.tensor(1.0, device="cuda")])
+        metric.to("cpu", dtype=torch.float64)
+        torch.testing.assert_close(metric.x, [torch.tensor(1.0, dtype=torch.float64)])
 
     #  `torch.cuda.is_available()` to decorator factory `unittest.skipUnless`.
     @unittest.skipUnless(
