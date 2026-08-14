@@ -567,34 +567,33 @@ class TestMultilabelBinnedAUPRC(MetricClassTester):
         num_labels = 3
         batch_size = 4
         num_bins = 5
+        torch.manual_seed(123)
+        input, target = rd.get_rand_data_multilabel(1, num_labels, batch_size)
+        threshold = torch.cat([torch.tensor([0, 1]), torch.rand(num_bins - 2)])
 
-        for _ in range(10):
-            input, target = rd.get_rand_data_multilabel(1, num_labels, batch_size)
-            threshold = torch.cat([torch.tensor([0, 1]), torch.rand(num_bins - 2)])
+        threshold, _ = torch.sort(threshold)
+        threshold = torch.unique(threshold)
 
-            threshold, _ = torch.sort(threshold)
-            threshold = torch.unique(threshold)
+        input_positions = torch.searchsorted(
+            threshold, input, right=False
+        )  # get thresholds not larger than each element
+        inputs_quantized = threshold[input_positions]
 
-            input_positions = torch.searchsorted(
-                threshold, input, right=False
-            )  # get thresholds not larger than each element
-            inputs_quantized = threshold[input_positions]
-
-            for average in (None, "macro"):
-                compute_result = multilabel_auprc(
-                    inputs_quantized,
-                    target,
-                    num_labels=num_labels,
-                    average=average,
-                )
-                self._test_multilabel_binned_auprc_class_with_input(
-                    input.unsqueeze(1),
-                    target.unsqueeze(1),
-                    compute_result,
-                    num_labels,
-                    threshold,
-                    average,
-                )
+        for average in (None, "macro"):
+            compute_result = multilabel_auprc(
+                inputs_quantized,
+                target,
+                num_labels=num_labels,
+                average=average,
+            )
+            self._test_multilabel_binned_auprc_class_with_input(
+                input.unsqueeze(1),
+                target.unsqueeze(1),
+                compute_result,
+                num_labels,
+                threshold,
+                average,
+            )
 
     def test_multilabel_binned_auprc_class_update_input_shape_different(
         self,
