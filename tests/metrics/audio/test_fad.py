@@ -15,7 +15,6 @@ from torcheval.metrics import FrechetAudioDistance
 from torcheval.metrics.audio.fad import _VGGISH_DOWNLOAD_MAX_ATTEMPTS
 
 
-# pyre-fixme[24]: Generic type `np.ndarray` expects 2 type parameters.
 def add_noise(x: np.ndarray, std_dev: float) -> np.ndarray:
     """Adds Gaussian noise to the samples.
     Args:
@@ -88,7 +87,6 @@ class TestFAD(unittest.TestCase):
         """FrechetAudioDistance correctly computes distances using TorchAudio's pretrained VGGish model."""
         fad = FrechetAudioDistance.with_vggish()
 
-        # pyrefly: ignore [bad-argument-type]
         np.random.seed(23487621)
         background_audio = gen_fad_test_batch(10, None)
         test1_audio = gen_fad_test_batch(5, 0.0001)
@@ -126,7 +124,6 @@ class TestFAD(unittest.TestCase):
         """
         fads = [FrechetAudioDistance.with_vggish().to("cpu") for _ in range(3)]
 
-        # pyrefly: ignore [bad-argument-type]
         np.random.seed(23487621)
         background_audio = gen_fad_test_batch(10, None)
         test_audio = gen_fad_test_batch(5, 0.00001)

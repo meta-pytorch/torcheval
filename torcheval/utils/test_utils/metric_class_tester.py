@@ -174,7 +174,6 @@ class MetricClassTester(unittest.TestCase):
         # pyrefly: ignore [missing-attribute]
         metric = self._test_case_spec.metric
         self.assertEqual(
-            # pyrefly: ignore [missing-attribute]
             set(metric._state_name_to_default.keys()),
             # pyrefly: ignore [missing-attribute]
             self._test_case_spec.state_names,
@@ -190,7 +189,6 @@ class MetricClassTester(unittest.TestCase):
         for i in range(self._test_case_spec.num_total_updates):
             # test chainable call
             current_batch_update_kwargs = {
-                # pyrefly: ignore [missing-attribute]
                 k: v[i]
                 # pyrefly: ignore [missing-attribute]
                 for k, v in self._test_case_spec.update_kwargs.items()
@@ -234,7 +232,6 @@ class MetricClassTester(unittest.TestCase):
         if test_merge_with_one_update:
             test_metric_0_copy = deepcopy(test_metrics[0])
             first_update_param = {
-                # pyrefly: ignore [missing-attribute]
                 k: v[0]
                 # pyrefly: ignore [missing-attribute]
                 for k, v in self._test_case_spec.update_kwargs.items()

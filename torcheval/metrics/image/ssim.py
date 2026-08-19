@@ -16,7 +16,6 @@ from typing import TypeVar
 import torch
 
 if find_spec("skimage") is not None:
-    # pyre-ignore[21]: Could not find a name `structural_similarity` defined in module `skimage.metrics`.
     from skimage.metrics import structural_similarity
 
     _SKIMAGE_AVAILABLE = True

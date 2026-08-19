@@ -75,7 +75,6 @@ class FrechetAudioDistance(Metric[torch.Tensor]):
         super().__init__(device=device)
 
         self.preproc = preproc
-        # pyre-ignore
         self.model = model.to(device)
         self.model.eval()
         self.model.requires_grad_(False)
@@ -148,10 +147,8 @@ class FrechetAudioDistance(Metric[torch.Tensor]):
         ) * self.pred_n / (self.pred_n - 1)
         return gaussian_frechet_distance(
             pred_mean.squeeze(0),
-            # pyre-fixme[6]: For 2nd argument expected `Tensor` but got `float`.
             pred_cov,
             target_mean.squeeze(0),
-            # pyre-fixme[6]: For 4th argument expected `Tensor` but got `float`.
             target_cov,
         )
 

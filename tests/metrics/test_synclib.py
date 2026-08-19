@@ -79,7 +79,6 @@ class SynclibTest(unittest.TestCase):
         pet.elastic_launch(lc, entrypoint=_test_numeric_sync_state)()
         pet.elastic_launch(lc, entrypoint=_test_numeric_sync_state)(0)
 
-    # pyre-ignore[56]
     @unittest.skipUnless(
         torch.distributed.is_available(), reason="Torch distributed is needed to run"
     )
@@ -107,7 +106,6 @@ class SynclibTest(unittest.TestCase):
             assert dst_rank == 0
             assert result is None
 
-    # pyre-ignore[56]
     @unittest.skipUnless(
         torch.distributed.is_available(), reason="Torch distributed is needed to run"
     )
@@ -140,7 +138,6 @@ class SynclibTest(unittest.TestCase):
         else:
             assert result is None
 
-    # pyre-ignore[56]
     @unittest.skipUnless(
         condition=torch.cuda.is_available(),
         reason="This test should only run on a GPU host.",

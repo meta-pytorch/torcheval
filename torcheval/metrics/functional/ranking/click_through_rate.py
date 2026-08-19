@@ -47,7 +47,6 @@ def click_through_rate(
         # pyrefly: ignore [bad-assignment]
         weights = 1.0
     click_total, weight_total = _click_through_rate_update(
-        # pyrefly: ignore [bad-argument-type]
         input,
         # pyrefly: ignore [bad-argument-type]
         weights,

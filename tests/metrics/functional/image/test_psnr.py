@@ -9,8 +9,6 @@
 import unittest
 
 import torch
-
-# pyre-ignore[21]: Could not find a name `peak_signal_noise_ratio` defined in module `skimage.metrics`.
 from skimage.metrics import peak_signal_noise_ratio as skimage_psnr
 from torcheval.metrics.functional import peak_signal_noise_ratio
 from torcheval.utils.test_utils.metric_class_tester import (

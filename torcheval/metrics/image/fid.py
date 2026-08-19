@@ -48,7 +48,6 @@ class FIDInceptionV3(nn.Module):
             weights Optional[str]: Defines the pre-trained weights to use.
         """
         super().__init__()
-        # pyre-ignore
         self.model = models.inception_v3(weights=weights)
         # Do not want fc layer
         # pyrefly: ignore [bad-assignment]

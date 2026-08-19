@@ -34,7 +34,6 @@ class ResnetFeatureExtractor(nn.Module):
             weights Optional[str]: Defines the pre-trained weights to use.
         """
         super().__init__()
-        # pyre-ignore
         self.model = models.resnet.resnet18(weights=weights)
         # Do not want fc layer
         # pyrefly: ignore [bad-assignment]
