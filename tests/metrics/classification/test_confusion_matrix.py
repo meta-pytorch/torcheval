@@ -18,6 +18,22 @@ from torcheval.utils.test_utils.metric_class_tester import (
 
 
 class TestBinaryConfusionMatrix(MetricClassTester):
+    def test_binary_confusion_matrix_float_target(self) -> None:
+        input = torch.tensor([0, 0, 0, 1, 1, 0, 1, 1, 1, 1])
+        target = torch.tensor([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
+        for dtype in (torch.float32, torch.float64):
+            for normalize in (None, "pred", "true", "all"):
+                metric = BinaryConfusionMatrix(normalize=normalize)
+                other = BinaryConfusionMatrix(normalize=normalize)
+                metric.update(input[:5], target[:5].to(dtype))
+                other.update(input[5:], target[5:].to(dtype))
+                metric.merge_state([other])
+                expected = torch.tensor(
+                    skcm(target, input, labels=[0, 1], normalize=normalize),
+                    dtype=metric.compute().dtype,
+                )
+                torch.testing.assert_close(metric.compute(), expected)
+
     def _test_binary_confusion_matrix_with_input(
         self,
         input: torch.Tensor,
@@ -178,6 +194,22 @@ class TestBinaryConfusionMatrix(MetricClassTester):
 
 
 class TestMulticlassConfusionMatrix(MetricClassTester):
+    def test_multiclass_confusion_matrix_float_target(self) -> None:
+        input = torch.tensor([0, 1, 2, 1, 2, 0])
+        target = torch.tensor([0, 1, 1, 2, 0, 2])
+        for dtype in (torch.float32, torch.float64):
+            for normalize in (None, "pred", "true", "all"):
+                metric = MulticlassConfusionMatrix(3, normalize=normalize)
+                other = MulticlassConfusionMatrix(3, normalize=normalize)
+                metric.update(input[:3], target[:3].to(dtype))
+                other.update(input[3:], target[3:].to(dtype))
+                metric.merge_state([other])
+                expected = torch.tensor(
+                    skcm(target, input, labels=[0, 1, 2], normalize=normalize),
+                    dtype=metric.compute().dtype,
+                )
+                torch.testing.assert_close(metric.compute(), expected)
+
     def _test_multiclass_confusion_matrix_with_input(
         self,
         input: torch.Tensor,
