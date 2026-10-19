@@ -224,7 +224,7 @@ def _update(
     if input.ndim == 2:
         input = torch.argmax(input, dim=1)
 
-    coordinates = torch.vstack((target, input))
+    coordinates = torch.vstack((target, input)).to(torch.int64)
     cm_shape = torch.Size([num_classes, num_classes])
 
     # Each prediction creates an entry at the position (true, pred)

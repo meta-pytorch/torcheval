@@ -18,6 +18,15 @@ from torcheval.utils.test_utils.metric_class_tester import BATCH_SIZE
 
 
 class TestBinaryConfusionMatrix(unittest.TestCase):
+    def test_binary_confusion_matrix_float_target(self) -> None:
+        input = torch.tensor([0, 0, 0, 1, 1, 0, 1, 1, 1, 1])
+        target = torch.tensor([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
+        for dtype in (torch.float32, torch.float64):
+            for normalize in (None, "pred", "true", "all"):
+                self._test_binary_confusion_matrix_with_input(
+                    input, target.to(dtype), normalize=normalize
+                )
+
     def _test_binary_confusion_matrix_with_input(
         self,
         input: torch.Tensor,
@@ -105,6 +114,15 @@ class TestBinaryConfusionMatrix(unittest.TestCase):
 
 
 class TestMultiClassConfusionMatrix(unittest.TestCase):
+    def test_multiclass_confusion_matrix_float_target(self) -> None:
+        input = torch.tensor([0, 1, 2, 1, 2, 0])
+        target = torch.tensor([0, 1, 1, 2, 0, 2])
+        for dtype in (torch.float32, torch.float64):
+            for normalize in (None, "pred", "true", "all"):
+                self._test_multiclass_confusion_matrix_with_input(
+                    input, target.to(dtype), num_classes=3, normalize=normalize
+                )
+
     def _test_multiclass_confusion_matrix_with_input(
         self,
         input: torch.Tensor,
