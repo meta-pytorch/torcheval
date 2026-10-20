@@ -6,6 +6,8 @@
 
 # pyre-strict
 
+from copy import deepcopy
+
 import torch
 from sklearn.metrics import r2_score
 from torcheval.metrics import R2Score
@@ -189,3 +191,52 @@ class TestR2Score(MetricClassTester):
         ):
             metric.num_regressors = 10
             metric.update(torch.rand(3, 3), torch.rand(3, 3)).compute()
+
+    def test_merge_state_preserves_independent_states(self) -> None:
+        for outputs in (1, 2):
+            with self.subTest(outputs=outputs):
+                targets = [
+                    torch.tensor([[1.0], [3.0]]).repeat(1, outputs) + offset
+                    for offset in (0, 4, 8)
+                ]
+                inputs = [target - torch.tensor([[0.0], [1.0]]) for target in targets]
+                donors = [
+                    R2Score(multioutput="raw_values").update(pred, target)
+                    for pred, target in zip(inputs[:2], targets[:2])
+                ]
+                states = [deepcopy(donor.state_dict()) for donor in donors]
+                results = [donor.compute() for donor in donors]
+                merged = R2Score(multioutput="raw_values").merge_state(donors)
+                for donor, state, result in zip(donors, states, results):
+                    torch.testing.assert_close(donor.state_dict(), state)
+                    torch.testing.assert_close(donor.compute(), result)
+                for count in (2, 3):
+                    if count == 3:
+                        merged.update(inputs[2], targets[2])
+                    pred, target = torch.cat(inputs[:count]), torch.cat(targets[:count])
+                    expected = 1 - (pred - target).square().sum(0) / (
+                        target - target.mean(0)
+                    ).square().sum(0)
+                    torch.testing.assert_close(merged.compute(), expected)
+                    for donor, state in zip(donors, states):
+                        torch.testing.assert_close(donor.state_dict(), state)
+                merged_state = deepcopy(merged.state_dict())
+                donors[0].update(inputs[2], targets[2])
+                torch.testing.assert_close(merged.state_dict(), merged_state)
+
+    def test_merge_state_single_donor_then_update(self) -> None:
+        target = torch.tensor([[1.0], [3.0]])
+        pred = torch.tensor([[1.0], [2.0]])
+        donor = R2Score().update(pred, target)
+        state = deepcopy(donor.state_dict())
+        merged = R2Score().merge_state([donor]).update(pred + 4, target + 4)
+        torch.testing.assert_close(donor.state_dict(), state)
+        pooled_pred, pooled_target = torch.cat([pred, pred + 4]), torch.cat(
+            [target, target + 4]
+        )
+        expected = (
+            1
+            - (pooled_pred - pooled_target).square().sum()
+            / (pooled_target - pooled_target.mean()).square().sum()
+        )
+        torch.testing.assert_close(merged.compute(), expected)

@@ -153,9 +153,11 @@ class R2Score(Metric[torch.Tensor]):
     def merge_state(self: TR2Score, metrics: Iterable[TR2Score]) -> TR2Score:
         for metric in metrics:
             if self.sum_squared_obs.ndim == 0 and metric.sum_squared_obs.ndim == 1:
-                self.sum_squared_obs = metric.sum_squared_obs.to(self.device)
-                self.sum_obs = metric.sum_obs.to(self.device)
-                self.sum_squared_residual = metric.sum_squared_residual.to(self.device)
+                self.sum_squared_obs = metric.sum_squared_obs.to(self.device, copy=True)
+                self.sum_obs = metric.sum_obs.to(self.device, copy=True)
+                self.sum_squared_residual = metric.sum_squared_residual.to(
+                    self.device, copy=True
+                )
             else:
                 self.sum_squared_obs += metric.sum_squared_obs.to(self.device)
                 self.sum_obs += metric.sum_obs.to(self.device)

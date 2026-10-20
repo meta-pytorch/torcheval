@@ -66,7 +66,11 @@ class Covariance(Metric[_Output]):
     def merge_state(self, metrics: Iterable[Self]) -> Self:
         with torch.inference_mode():
             for other in metrics:
-                self._update(other.sum, other.ss_sum, other.n)
+                if self.n == 0 and other.n > 0:
+                    # Adopt independent storage before subsequent in-place updates.
+                    self._update(other.sum.clone(), other.ss_sum.clone(), other.n)
+                else:
+                    self._update(other.sum, other.ss_sum, other.n)
         return self
 
     def compute(self) -> _Output:
