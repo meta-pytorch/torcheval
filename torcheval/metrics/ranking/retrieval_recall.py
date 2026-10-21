@@ -15,8 +15,8 @@ import torch
 from torcheval.metrics.functional.ranking.retrieval_recall import (
     _retrieval_recall_param_check,
     _retrieval_recall_update_input_check,
+    compute_nb_relevant_items_retrieved,
     get_topk,
-    retrieval_recall,
 )
 from torcheval.metrics.metric import Metric
 
@@ -102,6 +102,10 @@ class RetrievalRecall(Metric[torch.Tensor]):
         self.avg = avg
         self._add_state("topk", [torch.empty(0) for _ in range(num_queries)])
         self._add_state("target", [torch.empty(0) for _ in range(num_queries)])
+        self._add_state(
+            "total_relevant",
+            torch.zeros(num_queries, dtype=torch.long, device=self.device),
+        )
 
     @torch.inference_mode()
     # pyre-ignore[14]: `update` overrides method defined in `Metric` inconsistently.
@@ -134,6 +138,7 @@ class RetrievalRecall(Metric[torch.Tensor]):
     def update_single_query(
         self, i: int, input: torch.Tensor, target: torch.Tensor
     ) -> None:
+        self.total_relevant[i] += target.sum(dtype=torch.long).to(self.device)
         batch_preds = torch.cat([self.topk[i], input])
         batch_targets = torch.cat([self.target[i], target])
         preds_topk = get_topk(batch_preds, self.k)
@@ -146,7 +151,7 @@ class RetrievalRecall(Metric[torch.Tensor]):
         for i in range(self.num_queries):
             if not len(self.target[i]):
                 rp.append(torch.tensor([torch.nan]))
-            elif 1 not in self.target[i]:
+            elif self.total_relevant[i] == 0:
                 if self.empty_target_action == "pos":
                     rp.append(torch.tensor([1.0]))
                 elif self.empty_target_action == "neg":
@@ -159,8 +164,11 @@ class RetrievalRecall(Metric[torch.Tensor]):
                     )
             else:
                 rp.append(
-                    retrieval_recall(
-                        self.topk[i], self.target[i], self.k, self.limit_k_to_size
+                    (
+                        compute_nb_relevant_items_retrieved(
+                            self.topk[i], self.k, self.target[i]
+                        ).to(self.device)
+                        / self.total_relevant[i]
                     ).reshape(-1)
                 )
         rp = torch.cat(rp).to(self.device)
@@ -180,12 +188,12 @@ class RetrievalRecall(Metric[torch.Tensor]):
             metrics (Iterable[Metric]): metric instances whose states are to be merged.
         """
 
-        for i in range(self.num_queries):
-            self.topk[i] = torch.cat([self.topk[i]] + [m.topk[i] for m in metrics]).to(
-                self.device
-            )
-            self.target[i] = torch.cat(
-                [self.target[i]] + [m.target[i] for m in metrics]
-            ).to(self.device)
+        for metric in metrics:
+            for i in range(self.num_queries):
+                preds = torch.cat([self.topk[i], metric.topk[i].to(self.device)])
+                targets = torch.cat([self.target[i], metric.target[i].to(self.device)])
+                self.topk[i], indices = get_topk(preds, self.k)
+                self.target[i] = targets.gather(dim=-1, index=indices)
+            self.total_relevant += metric.total_relevant.to(self.device)
 
         return self
