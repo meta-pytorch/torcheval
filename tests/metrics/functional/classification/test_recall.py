@@ -132,6 +132,26 @@ class TestMulticlassRecall(unittest.TestCase):
                 ".* have been seen. These have been converted to zero.",
             )
 
+    def test_multiclass_recall_float_target(self) -> None:
+        input = torch.tensor([0, 1, 2, 1, 2, 0])
+        target = torch.tensor([0, 1, 1, 2, 0, 2])
+        for dtype in (torch.float32, torch.float64):
+            for average in (None, "micro", "macro", "weighted"):
+                my_compute_result = my_recall_score(
+                    input, target.to(dtype), num_classes=3, average=average
+                )
+                expected = torch.tensor(
+                    ref_recall_score(target.numpy(), input.numpy(), average=average),
+                    dtype=my_compute_result.dtype,
+                )
+                torch.testing.assert_close(
+                    my_compute_result,
+                    expected,
+                    equal_nan=True,
+                    atol=1e-8,
+                    rtol=1e-5,
+                )
+
     def test_recall_invalid_input(self) -> None:
         with self.assertRaisesRegex(
             ValueError, "`average` was not in the allowed values of .*, got binary"
@@ -220,6 +240,27 @@ class TestBinaryRecall(unittest.TestCase):
         target = torch.randint(high=num_classes, size=(BATCH_SIZE,))
 
         self._test_binary_recall_with_input(input, target)
+
+    def test_binary_recall_float_target(self) -> None:
+        input = torch.tensor([0.2, 0.3, 0.5, 0.7])
+        target = torch.tensor([1, 0, 1, 0])
+        threshold = 0.5
+        input_np = np.where(input.numpy() < threshold, 0, 1)
+        for dtype in (torch.float32, torch.float64):
+            my_compute_result = my_binary_recall_score(
+                input, target.to(dtype), threshold=threshold
+            )
+            expected = torch.tensor(
+                ref_recall_score(target.numpy(), input_np, average="binary"),
+                dtype=my_compute_result.dtype,
+            )
+            torch.testing.assert_close(
+                my_compute_result,
+                expected,
+                equal_nan=True,
+                atol=1e-8,
+                rtol=1e-5,
+            )
 
     def test_binary_recall_invalid_input(self) -> None:
         with self.assertRaisesRegex(

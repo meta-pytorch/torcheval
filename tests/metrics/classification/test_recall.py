@@ -87,6 +87,22 @@ class TestMulticlassRecall(MetricClassTester):
                     compute_result=compute_result,
                 )
 
+    def test_multiclass_recall_class_float_target(self) -> None:
+        input = torch.tensor([0, 1, 2, 1, 2, 0])
+        target = torch.tensor([0, 1, 1, 2, 0, 2])
+        for dtype in (torch.float32, torch.float64):
+            for average in (None, "micro", "macro", "weighted"):
+                metric = MulticlassRecall(num_classes=3, average=average)
+                other = MulticlassRecall(num_classes=3, average=average)
+                metric.update(input[:3], target[:3].to(dtype))
+                other.update(input[3:], target[3:].to(dtype))
+                metric.merge_state([other])
+                expected = torch.tensor(
+                    recall_score(target.numpy(), input.numpy(), average=average),
+                    dtype=metric.compute().dtype,
+                )
+                torch.testing.assert_close(metric.compute(), expected)
+
     def test_recall_class_base(self) -> None:
         num_classes = 4
         input = torch.randint(high=num_classes, size=(NUM_TOTAL_UPDATES, BATCH_SIZE))
@@ -248,6 +264,23 @@ class TestBinaryRecall(MetricClassTester):
             update_kwargs={"input": input, "target": target},
             compute_result=sklearn_result,
         )
+
+    def test_binary_recall_class_float_target(self) -> None:
+        input = torch.tensor([0.2, 0.3, 0.5, 0.7])
+        target = torch.tensor([1, 0, 1, 0])
+        threshold = 0.5
+        input_np = np.where(input.numpy() < threshold, 0, 1)
+        for dtype in (torch.float32, torch.float64):
+            metric = BinaryRecall(threshold=threshold)
+            other = BinaryRecall(threshold=threshold)
+            metric.update(input[:2], target[:2].to(dtype))
+            other.update(input[2:], target[2:].to(dtype))
+            metric.merge_state([other])
+            expected = torch.tensor(
+                recall_score(target.numpy(), input_np, average="binary"),
+                dtype=metric.compute().dtype,
+            )
+            torch.testing.assert_close(metric.compute(), expected)
 
     def test_binary_recall_class_base(self) -> None:
         num_classes = 2
