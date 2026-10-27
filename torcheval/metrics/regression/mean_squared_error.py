@@ -133,7 +133,9 @@ class MeanSquaredError(Metric[torch.Tensor]):
     ) -> TMeanSquaredError:
         for metric in metrics:
             if self.sum_squared_error.ndim == 0 and metric.sum_squared_error.ndim == 1:
-                self.sum_squared_error = metric.sum_squared_error.to(self.device)
+                self.sum_squared_error = metric.sum_squared_error.to(
+                    self.device
+                ).clone()
             else:
                 self.sum_squared_error += metric.sum_squared_error.to(self.device)
             self.sum_weight += metric.sum_weight.to(self.device)
