@@ -28,6 +28,11 @@ class TestWordInformationLost(unittest.TestCase):
             torch.tensor(0.6527777, dtype=torch.float64),
         )
 
+        torch.testing.assert_close(
+            word_information_lost("sat the cat", "the cat sat"),
+            torch.tensor(5 / 9, dtype=torch.float64),
+        )
+
     def test_word_information_lost_with_invalid_input(self) -> None:
         with self.assertRaisesRegex(
             AssertionError,
