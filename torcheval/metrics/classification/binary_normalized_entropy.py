@@ -109,6 +109,8 @@ class BinaryNormalizedEntropy(Metric[torch.Tensor]):
         """
         input = input.to(self.device)
         target = target.to(self.device)
+        if weight is not None:
+            weight = weight.to(self.device)
 
         cross_entropy, num_positive, num_examples = _binary_normalized_entropy_update(
             input, target, self.from_logits, self.num_tasks, weight

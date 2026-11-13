@@ -113,6 +113,8 @@ class BinaryAUROC(Metric[torch.Tensor]):
 
         if weight is None:
             weight = torch.ones_like(input, dtype=torch.double)
+        else:
+            weight = weight.to(self.device)
         _binary_auroc_update_input_check(input, target, self.num_tasks, weight)
         self.inputs.append(input)
         self.targets.append(target)

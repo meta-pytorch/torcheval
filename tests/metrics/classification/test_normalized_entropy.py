@@ -155,3 +155,12 @@ class TestBinaryNormalizedEntropy(MetricClassTester):
         #         torch.rand((5,)) * 10.0,
         #         torch.randint(0, 2, (5,)),
         #     )
+
+    def test_ne_weight_moved_to_metric_device(self) -> None:
+        # Regression test: ``weight`` must follow the metric's device like
+        # ``input`` and ``target`` do (the meta device stands in for CUDA).
+        metric = BinaryNormalizedEntropy(device=torch.device("meta"))
+        metric.update(
+            torch.rand(4), torch.tensor([0, 0, 1, 1]), weight=torch.rand(4)
+        )
+        self.assertEqual(metric.total_entropy.device.type, "meta")

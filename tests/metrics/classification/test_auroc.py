@@ -193,6 +193,15 @@ class TestBinaryAUROC(MetricClassTester):
         with self.assertRaisesRegex(ValueError, "`num_tasks` value should be greater"):
             metric = BinaryAUROC(num_tasks=0)
 
+    def test_binary_auroc_class_weight_moved_to_metric_device(self) -> None:
+        # Regression test: ``weight`` must follow the metric's device like
+        # ``input`` and ``target`` do (the meta device stands in for CUDA).
+        metric = BinaryAUROC(device=torch.device("meta"))
+        metric.update(
+            torch.rand(4), torch.tensor([0, 0, 1, 1]), weight=torch.rand(4)
+        )
+        self.assertEqual(metric.weights[0].device.type, "meta")
+
 
 class TestMulticlassAUROC(MetricClassTester):
     def test_auroc_class_base(self) -> None:
