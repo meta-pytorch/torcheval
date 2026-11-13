@@ -8,7 +8,7 @@
 
 
 import torch
-from torcheval.metrics.functional.text.helper import _get_errors_and_totals
+from torcheval.metrics.functional.text.helper import _get_correct_and_totals
 
 
 def _wil_update(
@@ -29,10 +29,12 @@ def _wil_update(
     if isinstance(target, str):
         target = [target]
     assert len(input) == len(target), (
-        f"Arguments must contain the same number of strings, but got len(input)={len(input)} and len(target)={len(target)}"
+        "Arguments must contain the same number of strings, "
+        f"but got len(input)={len(input)} and len(target)={len(target)}"
     )
-    errors, max_total, target_total, input_total = _get_errors_and_totals(input, target)
-    return errors - max_total, target_total, input_total
+    correct_total, target_total, preds_total = _get_correct_and_totals(input, target)
+    # Preserve the negative match count used by saved WordInformationLost states.
+    return -correct_total, target_total, preds_total
 
 
 def _wil_compute(

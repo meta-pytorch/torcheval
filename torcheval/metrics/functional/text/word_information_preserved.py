@@ -8,7 +8,7 @@
 
 
 import torch
-from torcheval.metrics.functional.text.helper import _get_errors_and_totals
+from torcheval.metrics.functional.text.helper import _get_correct_and_totals
 
 
 @torch.inference_mode()
@@ -55,9 +55,7 @@ def _word_information_preserved_update(
             target (str, List[str]): Reference word sequence(s) as a string or list of strings.
     """
     _word_information_preserved_input_check(input, target)
-    errors, max_total, target_total, input_total = _get_errors_and_totals(input, target)
-
-    return max_total - errors, target_total, input_total
+    return _get_correct_and_totals(input, target)
 
 
 def _word_information_preserved_compute(

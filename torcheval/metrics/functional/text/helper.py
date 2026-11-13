@@ -10,37 +10,46 @@
 import torch
 
 
-def _edit_distance(
+def _count_matches(
     prediction_tokens: list[str],
     reference_tokens: list[str],
 ) -> int:
     """
-    Dynamic programming algorithm to compute the edit distance between two word sequences.
+    Count matching words in a minimum-edit alignment of two word sequences.
+    Among alignments with the same edit distance, prefer the most matches.
 
     Args:
         prediction_tokens (List[str]): A tokenized predicted sentence
         reference_tokens (List[str]): A tokenized reference sentence
     """
-    dp = [[0] * (len(reference_tokens) + 1) for _ in range(len(prediction_tokens) + 1)]
-    for i in range(len(prediction_tokens) + 1):
-        dp[i][0] = i
-    for j in range(len(reference_tokens) + 1):
-        dp[0][j] = j
-    for i in range(1, len(prediction_tokens) + 1):
-        for j in range(1, len(reference_tokens) + 1):
-            if prediction_tokens[i - 1] == reference_tokens[j - 1]:
-                dp[i][j] = dp[i - 1][j - 1]
-            else:
-                dp[i][j] = min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1
-    return dp[-1][-1]
+    # Store (edit distance, negative match count) to minimize edits first,
+    # then maximize matches. Counting a common subsequence alone could choose
+    # an alignment with more edits than the Levenshtein distance.
+    previous_row = [(j, 0) for j in range(len(reference_tokens) + 1)]
+    for i, prediction_token in enumerate(prediction_tokens, 1):
+        current_row = [(i, 0)]
+        for j, reference_token in enumerate(reference_tokens, 1):
+            match = prediction_token == reference_token
+            current_row.append(
+                min(
+                    (previous_row[j][0] + 1, previous_row[j][1]),
+                    (current_row[j - 1][0] + 1, current_row[j - 1][1]),
+                    (
+                        previous_row[j - 1][0] + (not match),
+                        previous_row[j - 1][1] - match,
+                    ),
+                )
+            )
+        previous_row = current_row
+    return -previous_row[-1][1]
 
 
-def _get_errors_and_totals(
+def _get_correct_and_totals(
     input: str | list[str],
     target: str | list[str],
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
-    Calculate the edit distance, max length and lengths of predicted and reference word sequences.
+    Calculate the matches and lengths of predicted and reference word sequences.
 
         Args:
             input (str, List[str]): Predicted word sequence(s) to score as a string or list of strings.
@@ -50,16 +59,14 @@ def _get_errors_and_totals(
         input = [input]
     if isinstance(target, str):
         target = [target]
-    max_total = torch.tensor(0.0, dtype=torch.float64)
-    errors = torch.tensor(0.0, dtype=torch.float64)
+    correct_total = torch.tensor(0.0, dtype=torch.float64)
     target_total = torch.tensor(0.0, dtype=torch.float64)
     input_total = torch.tensor(0.0, dtype=torch.float64)
     for ipt, tgt in zip(input, target):
         input_tokens = ipt.split()
         target_tokens = tgt.split()
-        errors += _edit_distance(input_tokens, target_tokens)
+        correct_total += _count_matches(input_tokens, target_tokens)
         target_total += len(target_tokens)
         input_total += len(input_tokens)
-        max_total += max(len(target_tokens), len(input_tokens))
 
-    return errors, max_total, target_total, input_total
+    return correct_total, target_total, input_total
