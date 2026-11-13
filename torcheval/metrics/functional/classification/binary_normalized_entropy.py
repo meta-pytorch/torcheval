@@ -44,25 +44,25 @@ def binary_normalized_entropy(
         >>> input = torch.tensor([0.2, 0.3])
         >>> target = torch.tensor([1.0, 0.0])
         >>> weight = None
-        >>> binary_normalized_entropy(input, target, weight, from_logits=False)
+        >>> binary_normalized_entropy(input, target, weight=weight, from_logits=False)
         tensor(1.4183, dtype=torch.float64)
 
         >>> input = torch.tensor([0.2, 0.3])
         >>> target = torch.tensor([1.0, 0.0])
         >>> weight = torch.tensor([5.0, 1.0])
-        >>> binary_normalized_entropy(input, target, weight, from_logits=False)
+        >>> binary_normalized_entropy(input, target, weight=weight, from_logits=False)
         tensor(3.1087, dtype=torch.float64)
 
         >>> input = torch.tensor([-1.3863, -0.8473])
         >>> target = torch.tensor([1.0, 0.0])
         >>> weight = None
-        >>> binary_normalized_entropy(input, target, weight, from_logits=True)
+        >>> binary_normalized_entropy(input, target, weight=weight, from_logits=True)
         tensor(1.4183, dtype=torch.float64)
 
         >>> input = torch.tensor([[0.2, 0.3], [0.5, 0.1]])
         >>> target = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
         >>> weight = None
-        >>> binary_normalized_entropy(input, target, weight, from_logits=True)
+        >>> binary_normalized_entropy(input, target, weight=weight, num_tasks=2, from_logits=False)
         tensor([1.4183, 2.1610], dtype=torch.float64)
     """
     cross_entropy, num_positive, num_examples = _binary_normalized_entropy_update(

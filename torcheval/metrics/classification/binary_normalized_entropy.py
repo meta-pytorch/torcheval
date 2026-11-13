@@ -46,12 +46,12 @@ class BinaryNormalizedEntropy(Metric[torch.Tensor]):
         tensor([1.4183], dtype=torch.float64)
 
         >>> metric = BinaryNormalizedEntropy()
-        >>> metric.update(torch.tensor([0.2, 0.3]), torch.tensor([1.0, 0.0]), torch.tensor([5.0, 1.0]))
+        >>> metric.update(torch.tensor([0.2, 0.3]), torch.tensor([1.0, 0.0]), weight=torch.tensor([5.0, 1.0]))
         >>> metric.compute()
         tensor([3.1087], dtype=torch.float64)
 
-        >>> metric = BinaryNormalizedEntropy(from_logits = True)
-        >>> metric.update(tensor([-1.3863, -0.8473]), torch.tensor([1.0, 0.0]))
+        >>> metric = BinaryNormalizedEntropy(from_logits=True)
+        >>> metric.update(torch.tensor([-1.3863, -0.8473]), torch.tensor([1.0, 0.0]))
         >>> metric.compute()
         tensor([1.4183], dtype=torch.float64)
 
