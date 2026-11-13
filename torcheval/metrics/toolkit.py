@@ -384,6 +384,7 @@ def _apply_device_to_tensor_states(
             }
 
 
+# pyrefly: ignore [invalid-overload]
 def _sync_metric_object(
     local_metric_data: Metric | MutableMapping[str, Metric],
     process_group: dist.ProcessGroup,
