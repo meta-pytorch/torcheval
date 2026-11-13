@@ -52,6 +52,10 @@ class TestWordInformationPreserved(unittest.TestCase):
             ),
             torch.tensor(0.38095238, dtype=torch.float64),
         )
+        torch.testing.assert_close(
+            word_information_preserved("sat the cat", "the cat sat"),
+            torch.tensor(4 / 9, dtype=torch.float64),
+        )
 
     def test_word_information_preserved_with_invalid_input(self) -> None:
         with self.assertRaisesRegex(

@@ -8,7 +8,7 @@
 
 
 import torch
-from torcheval.metrics.functional.text.helper import _get_errors_and_totals
+from torcheval.metrics.functional.text.helper import _get_hits_and_totals
 
 
 def _wil_update(
@@ -31,8 +31,7 @@ def _wil_update(
     assert len(input) == len(target), (
         f"Arguments must contain the same number of strings, but got len(input)={len(input)} and len(target)={len(target)}"
     )
-    errors, max_total, target_total, input_total = _get_errors_and_totals(input, target)
-    return errors - max_total, target_total, input_total
+    return _get_hits_and_totals(input, target)
 
 
 def _wil_compute(
