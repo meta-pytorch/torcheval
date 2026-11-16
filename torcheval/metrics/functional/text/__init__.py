@@ -4,7 +4,6 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-# pyre-strict
 
 from torcheval.metrics.functional.text.bleu import bleu_score
 from torcheval.metrics.functional.text.perplexity import perplexity
