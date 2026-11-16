@@ -4,8 +4,6 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-# pyre-strict
-
 
 import torch
 from skimage.metrics import peak_signal_noise_ratio as skimage_peak_signal_noise_ratio
