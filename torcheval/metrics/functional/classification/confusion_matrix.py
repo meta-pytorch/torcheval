@@ -6,6 +6,7 @@
 
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 
 norm = torch.nn.functional.normalize
 
@@ -170,7 +171,7 @@ def _binary_confusion_matrix_update(
 
     input = torch.where(input < threshold, 0, 1)
 
-    return _update(input, target, 2)
+    return _script_on_use(_update)(input, target, 2)
 
 
 def _binary_confusion_matrix_update_input_check(
@@ -210,10 +211,9 @@ def _confusion_matrix_update(
     input: torch.Tensor, target: torch.Tensor, num_classes: int
 ) -> torch.Tensor:
     _confusion_matrix_update_input_check(input, target, num_classes)
-    return _update(input, target, num_classes)
+    return _script_on_use(_update)(input, target, num_classes)
 
 
-@torch.jit.script
 def _update(
     input: torch.Tensor,
     target: torch.Tensor,

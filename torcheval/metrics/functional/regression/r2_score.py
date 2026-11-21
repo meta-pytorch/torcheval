@@ -9,6 +9,7 @@
 
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 
 
 @torch.inference_mode()
@@ -91,10 +92,9 @@ def _r2_score_update(
     target: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     _r2_score_update_input_check(input, target)
-    return _update(input, target)
+    return _script_on_use(_update)(input, target)
 
 
-@torch.jit.script
 def _update(
     input: torch.Tensor,
     target: torch.Tensor,
@@ -123,7 +123,7 @@ def _r2_score_compute(
             "The `num_regressors` must be smaller than n_samples - 1, "
             f"got num_regressors={num_regressors}, n_samples={num_obs}.",
         )
-    return _compute(
+    return _script_on_use(_compute)(
         sum_squared_obs,
         sum_obs,
         rss,
@@ -133,7 +133,6 @@ def _r2_score_compute(
     )
 
 
-@torch.jit.script
 def _compute(
     sum_squared_obs: torch.Tensor,
     sum_obs: torch.Tensor,

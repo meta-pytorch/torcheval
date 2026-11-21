@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.binned_precision_recall_curve import (
     _binary_binned_precision_recall_curve_compute,
     _binary_binned_precision_recall_curve_update,
@@ -122,7 +123,7 @@ class BinaryBinnedPrecisionRecallCurve(
                 - recall (Tensor): Tensor of recall result. Its shape is (n_thresholds + 1, )
                 - thresholds (Tensor): Tensor of threshold. Its shape is (n_thresholds, )
         """
-        return _binary_binned_precision_recall_curve_compute(
+        return _script_on_use(_binary_binned_precision_recall_curve_compute)(
             self.num_tp, self.num_fp, self.num_fn, self.threshold
         )
 
@@ -398,7 +399,7 @@ class MultilabelBinnedPrecisionRecallCurve(
                 recall: Tensor of recall result. Its shape is (n_thresholds + 1, )
                 thresholds: Tensor of threshold. Its shape is (n_thresholds, )
         """
-        return _multilabel_binned_precision_recall_curve_compute(
+        return _script_on_use(_multilabel_binned_precision_recall_curve_compute)(
             self.num_tp,
             self.num_fp,
             self.num_fn,

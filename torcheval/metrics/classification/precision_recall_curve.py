@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.precision_recall_curve import (
     _binary_precision_recall_curve_compute,
     _binary_precision_recall_curve_update,
@@ -211,7 +212,7 @@ class MulticlassPrecisionRecallCurve(
             - thresholds: List of threshold. Each index indicates the result of a class.
 
         """
-        return _multiclass_precision_recall_curve_compute(
+        return _script_on_use(_multiclass_precision_recall_curve_compute)(
             torch.cat(self.inputs), torch.cat(self.targets), self.num_classes
         )
 
@@ -318,7 +319,7 @@ class MultilabelPrecisionRecallCurve(
             - recall: List of recall result. Each index indicates the result of a label.
             - thresholds: List of threshold. Each index indicates the result of a label.
         """
-        return _multilabel_precision_recall_curve_compute(
+        return _script_on_use(_multilabel_precision_recall_curve_compute)(
             torch.cat(self.inputs), torch.cat(self.targets), self.num_labels
         )
 

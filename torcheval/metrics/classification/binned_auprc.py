@@ -12,6 +12,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.binned_auprc import (
     _binary_binned_auprc_param_check,
     _binary_binned_auprc_update_input_check,
@@ -134,7 +135,9 @@ class BinaryBinnedAUPRC(Metric[torch.Tensor]):
                 target = target[None, :]
 
         for i in range(self.num_tasks):
-            num_tp, num_fp, num_fn = _update(input[i], target[i], self.threshold)
+            num_tp, num_fp, num_fn = _script_on_use(_update)(
+                input[i], target[i], self.threshold
+            )
             self.num_tp[i] += num_tp.to(self.device)
             self.num_fp[i] += num_fp.to(self.device)
             self.num_fn[i] += num_fn.to(self.device)
@@ -156,7 +159,9 @@ class BinaryBinnedAUPRC(Metric[torch.Tensor]):
 
         result = []
         for i in range(self.num_tasks):
-            prec, recall, thresh = _binary_binned_precision_recall_curve_compute(
+            prec, recall, thresh = _script_on_use(
+                _binary_binned_precision_recall_curve_compute
+            )(
                 self.num_tp[i],
                 self.num_fp[i],
                 self.num_fn[i],
@@ -457,7 +462,9 @@ class MultilabelBinnedAUPRC(Metric[torch.Tensor]):
         Returns:
             - Binned_AUPRC (Tensor): The return value of Binned_AUPRC for each task (num_tasks,).
         """
-        prec, recall, thresh = _multilabel_binned_precision_recall_curve_compute(
+        prec, recall, thresh = _script_on_use(
+            _multilabel_binned_precision_recall_curve_compute
+        )(
             self.num_tp,
             self.num_fp,
             self.num_fn,

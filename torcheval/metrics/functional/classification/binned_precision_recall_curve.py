@@ -7,6 +7,7 @@
 
 import torch
 import torch.nn.functional as F
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.precision_recall_curve import (
     _binary_precision_recall_curve_update_input_check,
     _multiclass_precision_recall_curve_update_input_check,
@@ -66,7 +67,7 @@ def binary_binned_precision_recall_curve(
     num_tp, num_fp, num_fn = _binary_binned_precision_recall_curve_update(
         input, target, threshold
     )
-    return _binary_binned_precision_recall_curve_compute(
+    return _script_on_use(_binary_binned_precision_recall_curve_compute)(
         num_tp, num_fp, num_fn, threshold
     )
 
@@ -77,10 +78,9 @@ def _binary_binned_precision_recall_curve_update(
     threshold: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     _binary_precision_recall_curve_update_input_check(input, target)
-    return _update(input, target, threshold)
+    return _script_on_use(_update)(input, target, threshold)
 
 
-@torch.jit.script
 def _update(
     input: torch.Tensor,
     target: torch.Tensor,
@@ -109,7 +109,6 @@ def _update(
     return num_tp, num_fp, num_fn
 
 
-@torch.jit.script
 def _binary_binned_precision_recall_curve_compute(
     num_tp: torch.Tensor,
     num_fp: torch.Tensor,
@@ -397,7 +396,7 @@ def multilabel_binned_precision_recall_curve(
     num_tp, num_fp, num_fn = _multilabel_binned_precision_recall_curve_update(
         input, target, num_labels, threshold, optimization
     )
-    return _multilabel_binned_precision_recall_curve_compute(
+    return _script_on_use(_multilabel_binned_precision_recall_curve_compute)(
         num_tp, num_fp, num_fn, num_labels, threshold
     )
 
@@ -503,7 +502,6 @@ def _multilabel_binned_precision_recall_curve_update(
         )
 
 
-@torch.jit.script
 def _multilabel_binned_precision_recall_curve_compute(
     num_tp: torch.Tensor,
     num_fp: torch.Tensor,

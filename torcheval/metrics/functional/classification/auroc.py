@@ -7,6 +7,7 @@
 
 import torch
 from torch.nn import functional as F
+from torcheval.metrics.functional._jit import _script_on_use
 
 # Optionally import fbgemm_gpu to enable use of hand fused kernel
 try:
@@ -108,10 +109,11 @@ def multiclass_auroc(
     """
     _multiclass_auroc_param_check(num_classes, average)
     _multiclass_auroc_update_input_check(input, target, num_classes)
-    return _multiclass_auroc_compute(input, target, num_classes, average)
+    return _script_on_use(_multiclass_auroc_compute)(
+        input, target, num_classes, average
+    )
 
 
-@torch.jit.script
 def _binary_auroc_compute_jit(
     input: torch.Tensor,
     target: torch.Tensor,
@@ -175,7 +177,7 @@ def _binary_auroc_compute(
         else:
             return auroc
     else:
-        return _binary_auroc_compute_jit(input, target, weight)
+        return _script_on_use(_binary_auroc_compute_jit)(input, target, weight)
 
 
 def _binary_auroc_update_input_check(
@@ -206,7 +208,6 @@ def _binary_auroc_update_input_check(
         )
 
 
-@torch.jit.script
 def _multiclass_auroc_compute(
     input: torch.Tensor,
     target: torch.Tensor,

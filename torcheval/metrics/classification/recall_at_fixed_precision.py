@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.recall_at_fixed_precision import (
     _binary_recall_at_fixed_precision_compute,
     _binary_recall_at_fixed_precision_update_input_check,
@@ -204,7 +205,7 @@ class MultilabelRecallAtFixedPrecision(
     def compute(
         self: TMultilabelRecallAtFixedPrecision,
     ) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
-        return _multilabel_recall_at_fixed_precision_compute(
+        return _script_on_use(_multilabel_recall_at_fixed_precision_compute)(
             torch.cat(self.inputs),
             torch.cat(self.targets),
             self.num_labels,

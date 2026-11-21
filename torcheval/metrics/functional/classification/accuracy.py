@@ -6,6 +6,7 @@
 
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 
 
 @torch.inference_mode()
@@ -42,7 +43,7 @@ def binary_accuracy(
     """
 
     num_correct, num_total = _binary_accuracy_update(input, target, threshold)
-    return _accuracy_compute(num_correct, num_total, "micro")
+    return _script_on_use(_accuracy_compute)(num_correct, num_total, "micro")
 
 
 @torch.inference_mode()
@@ -101,7 +102,7 @@ def multiclass_accuracy(
     num_correct, num_total = _multiclass_accuracy_update(
         input, target, average, num_classes, k
     )
-    return _accuracy_compute(num_correct, num_total, average)
+    return _script_on_use(_accuracy_compute)(num_correct, num_total, average)
 
 
 @torch.inference_mode()
@@ -172,7 +173,7 @@ def multilabel_accuracy(
     num_correct, num_total = _multilabel_accuracy_update(
         input, target, threshold, criteria
     )
-    return _accuracy_compute(num_correct, num_total, "micro")
+    return _script_on_use(_accuracy_compute)(num_correct, num_total, "micro")
 
 
 @torch.inference_mode()
@@ -243,7 +244,7 @@ def topk_multilabel_accuracy(
     num_correct, num_total = _topk_multilabel_accuracy_update(
         input, target, criteria, k
     )
-    return _accuracy_compute(num_correct, num_total, "micro")
+    return _script_on_use(_accuracy_compute)(num_correct, num_total, "micro")
 
 
 def _multiclass_accuracy_update(
@@ -276,7 +277,6 @@ def _multiclass_accuracy_update(
     return num_correct, num_total
 
 
-@torch.jit.script
 def _accuracy_compute(
     num_correct: torch.Tensor,
     num_total: torch.Tensor,
@@ -390,7 +390,7 @@ def _multilabel_accuracy_update(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     _multilabel_accuracy_update_input_check(input, target)
     input_label = torch.where(input < threshold, 0, 1)
-    return _multilabel_update(input_label, target, criteria)
+    return _script_on_use(_multilabel_update)(input_label, target, criteria)
 
 
 def _topk_multilabel_accuracy_update(
@@ -403,10 +403,9 @@ def _topk_multilabel_accuracy_update(
     input_label = torch.zeros(input.size(), device=input.device).scatter_(
         -1, input.topk(k=k, dim=-1).indices, 1.0
     )
-    return _multilabel_update(input_label, target, criteria)
+    return _script_on_use(_multilabel_update)(input_label, target, criteria)
 
 
-@torch.jit.script
 def _multilabel_update(
     input: torch.Tensor,
     target: torch.Tensor,

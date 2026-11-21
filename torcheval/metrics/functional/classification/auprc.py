@@ -6,6 +6,7 @@
 
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.precision_recall_curve import (
     _compute_for_each_class,
     multiclass_precision_recall_curve,
@@ -240,12 +241,14 @@ def _binary_auprc_compute(
 ) -> torch.Tensor:
     # for one task preserve the ndim of the input and target tensor
     if num_tasks == 1 and input.ndim == 1:
-        p, r, t = _compute_for_each_class(input, target, 1)
+        p, r, t = _script_on_use(_compute_for_each_class)(input, target, 1)
         return _riemann_integral(r, p)
     else:
         auprcs = []
         for i in range(num_tasks):
-            p, r, t = _compute_for_each_class(input[i, :], target[i, :], 1)
+            p, r, t = _script_on_use(_compute_for_each_class)(
+                input[i, :], target[i, :], 1
+            )
             auprcs.append(_riemann_integral(r, p))
         return torch.tensor(auprcs, device=input.device)
 

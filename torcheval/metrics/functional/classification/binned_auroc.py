@@ -7,6 +7,7 @@
 
 import torch
 from torch.nn import functional as F
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.tensor_utils import _create_threshold_tensor
 
 DEFAULT_NUM_THRESHOLD = 200
@@ -65,7 +66,7 @@ def binary_binned_auroc(
     )
     _binary_binned_auroc_param_check(num_tasks, threshold)
     _binary_binned_auroc_update_input_check(input, target, num_tasks, threshold)
-    return _binary_binned_auroc_compute(input, target, threshold)
+    return _script_on_use(_binary_binned_auroc_compute)(input, target, threshold)
 
 
 def _binary_binned_auroc_param_check(
@@ -107,7 +108,6 @@ def _binary_binned_auroc_update_input_check(
         )
 
 
-@torch.jit.script
 def _binary_binned_auroc_compute(
     input: torch.Tensor,
     target: torch.Tensor,
@@ -179,12 +179,11 @@ def multiclass_binned_auroc(
     )
     _multiclass_binned_auroc_param_check(num_classes, threshold, average)
     _multiclass_binned_auroc_update_input_check(input, target, num_classes)
-    return _multiclass_binned_auroc_compute(
+    return _script_on_use(_multiclass_binned_auroc_compute)(
         input, target, num_classes, threshold, average
     )
 
 
-@torch.jit.script
 def _multiclass_binned_auroc_compute(
     input: torch.Tensor,
     target: torch.Tensor,
