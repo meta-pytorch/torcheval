@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.auroc import (
     _binary_auroc_compute,
     _binary_auroc_update_input_check,
@@ -259,7 +260,7 @@ class MulticlassAUROC(Metric[torch.Tensor]):
                 "No samples to compute auroc with. Did you call update?"
             )
 
-        return _multiclass_auroc_compute(
+        return _script_on_use(_multiclass_auroc_compute)(
             torch.cat(self.inputs),
             torch.cat(self.targets),
             self.num_classes,

@@ -6,6 +6,7 @@
 
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.precision_recall_curve import (
     _binary_precision_recall_curve_compute,
     _binary_precision_recall_curve_update_input_check,
@@ -73,7 +74,9 @@ def _binary_recall_at_fixed_precision_compute(
     precision, recall, threshold = _binary_precision_recall_curve_compute(
         input, target, weights
     )
-    return _recall_at_precision(precision, recall, threshold, min_precision)
+    return _script_on_use(_recall_at_precision)(
+        precision, recall, threshold, min_precision
+    )
 
 
 @torch.inference_mode()
@@ -115,7 +118,7 @@ def multilabel_recall_at_fixed_precision(
     _multilabel_recall_at_fixed_precision_update_input_check(
         input, target, num_labels, min_precision
     )
-    return _multilabel_recall_at_fixed_precision_compute(
+    return _script_on_use(_multilabel_recall_at_fixed_precision_compute)(
         input, target, num_labels, min_precision
     )
 
@@ -131,7 +134,6 @@ def _multilabel_recall_at_fixed_precision_update_input_check(
         )
 
 
-@torch.jit.script
 def _recall_at_precision(
     precision: torch.Tensor,
     recall: torch.Tensor,
@@ -144,7 +146,6 @@ def _recall_at_precision(
     return max_recall, torch.abs(best_threshold)
 
 
-@torch.jit.script
 def _multilabel_recall_at_fixed_precision_compute(
     input: torch.Tensor, target: torch.Tensor, num_labels: int, min_precision: float
 ) -> tuple[list[torch.Tensor], list[torch.Tensor]]:

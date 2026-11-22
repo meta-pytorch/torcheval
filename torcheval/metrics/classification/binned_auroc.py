@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.binned_auroc import (
     _binary_binned_auroc_compute,
     _binary_binned_auroc_param_check,
@@ -128,7 +129,7 @@ class BinaryBinnedAUROC(Metric[tuple[torch.Tensor, torch.Tensor]]):
                 - Binned_AUROC (Tensor): The return value of Binned_AUROC for each task (num_tasks,).
                 - threshold (Tensor): Tensor of threshold. Its shape is (n_thresholds, ).
         """
-        return _binary_binned_auroc_compute(
+        return _script_on_use(_binary_binned_auroc_compute)(
             torch.cat(self.inputs, -1), torch.cat(self.targets, -1), self.threshold
         )
 
@@ -232,7 +233,7 @@ class MulticlassBinnedAUROC(Metric[tuple[torch.Tensor, torch.Tensor]]):
     def compute(
         self: TMulticlassBinnedAUROC,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        return _multiclass_binned_auroc_compute(
+        return _script_on_use(_multiclass_binned_auroc_compute)(
             torch.cat(self.inputs),
             torch.cat(self.targets),
             self.num_classes,

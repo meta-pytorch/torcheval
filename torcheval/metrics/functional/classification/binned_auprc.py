@@ -6,6 +6,7 @@
 
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.binned_precision_recall_curve import (
     _binary_binned_precision_recall_curve_compute,
     _binary_binned_precision_recall_curve_update,
@@ -92,9 +93,9 @@ def _binary_binned_auprc_compute(
         num_tp, num_fp, num_fn = _binary_binned_precision_recall_curve_update(
             input, target, threshold
         )
-        precision, recall, _ = _binary_binned_precision_recall_curve_compute(
-            num_tp, num_fp, num_fn, threshold
-        )
+        precision, recall, _ = _script_on_use(
+            _binary_binned_precision_recall_curve_compute
+        )(num_tp, num_fp, num_fn, threshold)
         auprc_result = _riemann_integral(recall, precision)
     else:
         auprcs = []
@@ -102,9 +103,9 @@ def _binary_binned_auprc_compute(
             num_tp, num_fp, num_fn = _binary_binned_precision_recall_curve_update(
                 input[i, :], target[i, :], threshold
             )
-            precision, recall, _ = _binary_binned_precision_recall_curve_compute(
-                num_tp, num_fp, num_fn, threshold
-            )
+            precision, recall, _ = _script_on_use(
+                _binary_binned_precision_recall_curve_compute
+            )(num_tp, num_fp, num_fn, threshold)
             auprcs.append(_riemann_integral(recall, precision))
         auprc_result = torch.tensor(auprcs, device=input.device)
     auprc_result = torch.nan_to_num(auprc_result, nan=0.0)
@@ -393,9 +394,9 @@ def _multilabel_binned_auprc_compute(
     num_tp, num_fp, num_fn = _multilabel_binned_precision_recall_curve_update(
         input, target, num_labels, threshold, optimization
     )
-    prec, recall, thresh = _multilabel_binned_precision_recall_curve_compute(
-        num_tp, num_fp, num_fn, num_labels, threshold
-    )
+    prec, recall, thresh = _script_on_use(
+        _multilabel_binned_precision_recall_curve_compute
+    )(num_tp, num_fp, num_fn, num_labels, threshold)
     return _compute_riemann_integrals(prec, recall, average, input.device)
 
 

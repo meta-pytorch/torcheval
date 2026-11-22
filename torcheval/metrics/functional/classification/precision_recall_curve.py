@@ -7,6 +7,7 @@
 
 import torch
 import torch.nn.functional as F
+from torcheval.metrics.functional._jit import _script_on_use
 
 """
 This file contains binary_precision_recall_curve, multiclass_precision_recall_curve and multilabel_precision_recall_curve functions.
@@ -64,7 +65,9 @@ def _binary_precision_recall_curve_compute(
     target: torch.Tensor,
     weights: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    precision, recall, threshold = _compute_for_each_class(input, target, 1, weights)
+    precision, recall, threshold = _script_on_use(_compute_for_each_class)(
+        input, target, 1, weights
+    )
 
     return precision, recall, threshold
 
@@ -141,7 +144,9 @@ def multiclass_precision_recall_curve(
     if num_classes is None and input.ndim == 2:
         num_classes = input.shape[1]
     _multiclass_precision_recall_curve_update(input, target, num_classes)
-    return _multiclass_precision_recall_curve_compute(input, target, num_classes)
+    return _script_on_use(_multiclass_precision_recall_curve_compute)(
+        input, target, num_classes
+    )
 
 
 def _multiclass_precision_recall_curve_update(
@@ -152,7 +157,6 @@ def _multiclass_precision_recall_curve_update(
     _multiclass_precision_recall_curve_update_input_check(input, target, num_classes)
 
 
-@torch.jit.script
 def _multiclass_precision_recall_curve_compute(
     input: torch.Tensor,
     target: torch.Tensor,
@@ -204,7 +208,6 @@ def _multiclass_precision_recall_curve_update_input_check(
         )
 
 
-@torch.jit.script
 def _compute_for_each_class(
     input: torch.Tensor,
     target: torch.Tensor,
@@ -295,7 +298,9 @@ def multilabel_precision_recall_curve(
     if num_labels is None:
         num_labels = input.shape[1]
     _multilabel_precision_recall_curve_update(input, target, num_labels)
-    return _multilabel_precision_recall_curve_compute(input, target, num_labels)
+    return _script_on_use(_multilabel_precision_recall_curve_compute)(
+        input, target, num_labels
+    )
 
 
 def _multilabel_precision_recall_curve_update(
@@ -306,7 +311,6 @@ def _multilabel_precision_recall_curve_update(
     _multilabel_precision_recall_curve_update_input_check(input, target, num_labels)
 
 
-@torch.jit.script
 def _multilabel_precision_recall_curve_compute(
     input: torch.Tensor,
     target: torch.Tensor,

@@ -10,6 +10,7 @@
 import logging
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 
 
 @torch.inference_mode()
@@ -159,10 +160,9 @@ def _f1_score_update(
     average: str | None,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     _f1_score_update_input_check(input, target, num_classes)
-    return _update(input, target, num_classes, average)
+    return _script_on_use(_update)(input, target, num_classes, average)
 
 
-@torch.jit.script
 def _update(
     input: torch.Tensor,
     target: torch.Tensor,

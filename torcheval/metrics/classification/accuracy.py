@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 from torcheval.metrics.functional.classification.accuracy import (
     _accuracy_compute,
     _accuracy_param_check,
@@ -139,7 +140,9 @@ class MulticlassAccuracy(Metric[torch.Tensor]):
 
         NaN is returned if no calls to ``update()`` are made before ``compute()`` is called.
         """
-        return _accuracy_compute(self.num_correct, self.num_total, self.average)
+        return _script_on_use(_accuracy_compute)(
+            self.num_correct, self.num_total, self.average
+        )
 
     @torch.inference_mode()
     def merge_state(self: TAccuracy, metrics: Iterable[TAccuracy]) -> TAccuracy:

@@ -6,6 +6,7 @@
 
 
 import torch
+from torcheval.metrics.functional._jit import _script_on_use
 
 
 @torch.inference_mode()
@@ -74,10 +75,9 @@ def _mean_squared_error_update(
     sample_weight: torch.Tensor | None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     _mean_squared_error_update_input_check(input, target, sample_weight)
-    return _update(input, target, sample_weight)
+    return _script_on_use(_update)(input, target, sample_weight)
 
 
-@torch.jit.script
 def _update(
     input: torch.Tensor,
     target: torch.Tensor,
