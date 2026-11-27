@@ -38,9 +38,12 @@ jobs:
 
   gpu_unit_tests:
     runs-on: ${{ matrix.os }}
+    container:
+      image: pytorch/almalinux-builder:cuda12.8
+      options: --gpus all
     strategy:
       matrix:
-        os: [linux.8xlarge.nvidia.gpu]
+        os: [mt-l-x86iavx512-29-115-t4]
         python-version: [3.8]
         cuda-tag: ["cu11"]
     steps:
@@ -52,21 +55,6 @@ jobs:
           miniconda-version: "latest"
           activate-environment: test
           python-version: ${{ matrix.python-version }}
-      - name: Install nvidia driver, nvidia-docker runtime, set GPU_FLAG
-        uses: pytorch/test-infra/.github/actions/setup-nvidia@main
-      - name: Display EC2 information
-        shell: bash
-        run: |
-          set -euo pipefail
-          function get_ec2_metadata() {
-            # Pulled from instance metadata endpoint for EC2
-            # see https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
-            category=$1
-            curl -H "X-aws-ec2-metadata-token: $(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 30")" -fsSL "http://169.254.169.254/latest/meta-data/${category}"
-          }
-          echo "ami-id: $(get_ec2_metadata ami-id)"
-          echo "instance-id: $(get_ec2_metadata instance-id)"
-          echo "instance-type: $(get_ec2_metadata instance-type)"
       - name: Install dependencies
         shell: bash -l {0}
         run: |
